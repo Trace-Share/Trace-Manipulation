@@ -580,7 +580,7 @@ def tcp_timestamp_change(packet, data):
     - packets timestamp is equal to tcp timestamp)
     """
     c_dict = tcp_get_conversation_dict(packet, data)
-    timestamps:dict= c_dict.get('timestamps')
+    timestamps= c_dict.get('timestamps')
     if timestamps is None:
         timestamps = {0:0}
         c_dict['timestamps']=timestamps
