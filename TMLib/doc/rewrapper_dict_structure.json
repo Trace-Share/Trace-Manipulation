@@ -1,0 +1,115 @@
+{
+    "global" : {
+        "generate_timestamp_function_alt" : "val[function]"
+        , "timestamp_threshold" : "val[float]"
+        , "attack" : {
+            "timestamp_shift" : "val[float]"
+            , "tcp_avg_delay_map" : {
+                "val[str]#ip address source" : {
+                    "val[str]#ip address destination" : "val[float]"
+                }
+            }
+            , "timestamp_delay_map" : {
+                "val[str]#ip address source" : "val[float]"
+            }
+            , "timestamp_delay_set" : "val[set[str]]#ip addresses"
+            , "tcp.conversation" : {
+                "val[str]#ip address source" : {
+                    "val[str]#ip address destination" : {
+                        "val[int]#port source" : {
+                            "val[int]#port destination" : {
+                                "counter.handshake.first_two" : "val[list[int]]#initial window size list"
+                                , "tcp.window.irw" : {
+                                    "default" : "val[int]#default initial reciever window"
+                                    , "val[int]#window from" : "val[int]#window to"
+                                }
+                                , "tcp.window.shift" : "val[int]#delta between old and new window size"
+                            }
+                        }
+                    }
+                }
+            }
+            , "tcp.defaults.ip_map" : {
+                "val[src]#ip address" : {
+                    "tcp.window.irw" : {
+                        "default" : "val[int]#default initial reciever window"
+                        , "val[int]#window from" : "val[int]#window to"
+                    }
+                    , "tcp.window.shift" : "val[int]#delta between old and new window size"
+                    
+                }
+            }
+            , "tcp.defaults" : {
+                "tcp.window.irw" : {
+                    "default" : "val[int]#default initial reciever window"
+                    , "val[int]#window from" : "val[int]#window to"
+                }
+                , "tcp.window.shift" : "val[int]#delta between old and new window size"
+            }
+        }
+        , "target" : {
+            "mac_address_map" : {
+                "val[str]#mac address" : "val[str]#mac address"
+            }
+            , "ip_address_map" : {
+                "val[str]#ip address from" : "val[str]#ip address to"
+            }
+            , "ip_ttl_map" : {
+                "val[str]#ip address" : "val[int]"
+            }
+            , "ip_ttl_default" : "val[int]"
+            , "pps_record_map" : {
+                "val[str]#ip address" : "val[int]"
+            }
+            , "win_size_map" : {
+                "val[str]#ip address" : "val[int]"
+            }
+            , "win_size_default" : "val[int]"
+            , "mss_map" : {
+                "val[int]#ip address" : "val[int]"
+            }
+            , "mss_default" : "val[int]"
+            , "port_map_forIP" : {
+                "val[str]#ip address" : {
+                    "val[str]#port from" : "val[str]#port to"
+                }
+            }
+            , "mss_exceptions" : "val[set[str]]#ip addresses"
+            , "win_size_exceptions" : "val[set[str]]#ip addresses"
+            , "ttl_exceptions" : "val[set[str]]#ip addresses"
+            , "tcp_avg_delay_map" : {
+                "val[str]#ip address source" : {
+                    "val[str]#ip address destination" : "val[float]"
+                }
+            }
+        }
+    }
+    , "conversation" : {
+        "previous_timestamp_old" : "val[float]"
+        , "previous_timestamp_new" : "val[float]"
+        , "timestamp_next_pkt" : "val[float]"
+        , "tcp.conversatios" : {
+            "val[str]#ip address" : {
+                "val[str]#ip address" : {
+                    "val[int]#port" : {
+                        "val[int]#port" : {
+                            "counter" : "val[int]#packet count"
+                            , "conversation.state" : "val[str]#conversation state" 
+                        }
+                    }
+                }
+            }
+        }
+    }
+    , "packet" : {
+        "timestamp.current.old" : "val[float]"
+        , "timestamp.current.new" : "val[float]"
+        , "timestamp.current.old.nopostprocess" : "val[float]"
+        , "timestamp.current.new.nopostprocess" : "val[float]"
+        , "timestamp.current.shift.nopostprocess" : "val[float]"
+        , "ip_src_old" : "val[str]#ip address"
+        , "ip_dst_old" : "val[str]#ip address"
+        , "ip_src_new" : "val[str]#ip address"
+        , "ip_dst_new" : "val[str]#ip address"
+    }
+}

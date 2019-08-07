@@ -123,26 +123,26 @@ def timestamp_tcp_max_shift(packet, data, prev_timestamp_old, prev_timestamp_new
 ###############################################
 
 
-def timestamp_pps_shift(packet, data): #incomplete
-    """
-    Unsused, incomplete
-    """
-    ip_pps_record = data[TMdef.GLOBAL][TMdef.TARGET]['pps_record_map'].get(data[TMdef.PACKET]['ip_src_new'])
-    if not ip_pps_record:
-        statistics = data[TMdef.GLOBAL]['statistics']
-        pps = statistics.get_pps_sent(data[TMdef.PACKET]['ip_src_new'])
-        complement_interval_pps = statistics.calculate_complement_packet_rates(pps)
-        data[TMdef.GLOBAL][TMdef.TARGET]['pps_record_map'][data[TMdef.PACKET]['ip_src_new']] = {'pps' : pps , 'complement_interval_pps': complement_interval_pps}
-    else:
-        pps = ip_pps_record['pps']
-        complement_interval_pps = ip_pps_record['complement_interval_pps']
+# def timestamp_pps_shift(packet, data): #incomplete
+#     """
+#     Unsused, incomplete
+#     """
+#     ip_pps_record = data[TMdef.GLOBAL][TMdef.TARGET]['pps_record_map'].get(data[TMdef.PACKET]['ip_src_new'])
+#     if not ip_pps_record:
+#         statistics = data[TMdef.GLOBAL]['statistics']
+#         pps = statistics.get_pps_sent(data[TMdef.PACKET]['ip_src_new'])
+#         complement_interval_pps = statistics.calculate_complement_packet_rates(pps)
+#         data[TMdef.GLOBAL][TMdef.TARGET]['pps_record_map'][data[TMdef.PACKET]['ip_src_new']] = {'pps' : pps , 'complement_interval_pps': complement_interval_pps}
+#     else:
+#         pps = ip_pps_record['pps']
+#         complement_interval_pps = ip_pps_record['complement_interval_pps']
 
-    timestamp_this_pkt = data[TMdef.CONVERSATION]['timestamp_next_pkt']
+#     timestamp_this_pkt = data[TMdef.CONVERSATION]['timestamp_next_pkt']
 
-    pps = max(Util.get_interval_pps(complement_interval_pps, timestamp_next_pkt), 10)
-    data[TMdef.CONVERSATION]['timestamp_next_pkt'] = Util.update_timestamp(timestamp_next_pkt, pps)
+#     pps = max(Util.get_interval_pps(complement_interval_pps, timestamp_next_pkt), 10)
+#     data[TMdef.CONVERSATION]['timestamp_next_pkt'] = Util.update_timestamp(timestamp_next_pkt, pps)
 
-    return timestamp_this_pkt
+#     return timestamp_this_pkt
 
 
 ###############################################

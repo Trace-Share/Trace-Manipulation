@@ -443,11 +443,11 @@ def tcp_conversation_tracker(packet, data):
         counter = 0
     else:
         counter += 1
-    c_dict['counter'] = counter
+    c_dict['counter'] = counter # TODO added to json
 
     guess = True
     if global_c_dict is not None:
-        handshake_packets = global_c_dict.get('handshake.first_two')
+        handshake_packets = global_c_dict.get('counter.handshake.first_two')
         if handshake_packets is not None:
             guess = False
             new_state = 'init' if counter in handshake_packets else new_state
@@ -459,7 +459,7 @@ def tcp_conversation_tracker(packet, data):
             new_state = 'init'
 
 
-    c_dict['conversation.state'] = new_state
+    c_dict['conversation.state'] = new_state # TODO added to json
     
 
 
@@ -470,15 +470,17 @@ def tcp_win(packet, data):
     TODO Define query to export minimum
     """
     c_dict = tcp_get_conversation_dict(packet, data)
-    congestion_control = c_dict['congestion_control']
+    congestion_control = c_dict['congestion_control'] # TODO determine if useful
     global_c_dict = tcp_get_global_dict_conversation_entry(packet, data)
 
     conversation_state = c_dict['conversation.state']
 
+    old_win = packet.getfieldval('window')
+
     if conversation_state in IRW_STATES:
         # TODO set Initial Window
         ## Find conversation specific value
-        win = global_c_dict.get('tcp.IRW')
+        win = global_c_dict.get('tcp.window.irw')
         ## Find the general ip based value
         if win is None:
             # TODO add the keys
@@ -496,7 +498,13 @@ def tcp_win(packet, data):
                         ]
                     )
             if win is not None:
-                win = win.get('IRW')
+                win = win.get('tcp.window.irw')
+        
+        if win is not None:
+            _w = win.get(old_win)
+            if _w is None:
+                win = win.get('default')
+
         ## Find default value
         if win is None:
             win = data[
@@ -504,8 +512,14 @@ def tcp_win(packet, data):
                     ][
                     TMdef.ATTACK
                     ][
-                    'tcp.defaults.IRW'
+                    'tcp.defaults.irw'
                     ]
+            _w = win.get(old_win)
+            if _w is None:
+                ## This should raise exception if missing
+                ## dont use .get()
+                win = win['default']
+        
 
     # TODO add window changes
     else:
@@ -513,7 +527,6 @@ def tcp_win(packet, data):
         # TODO determine if scaling tracking is required
         # is_scaled = True
         # if is_scaled:
-        old_win = packet.getfieldval('window')
         """
         Opt 1 
             - store old (? & new) buffer size
@@ -522,11 +535,11 @@ def tcp_win(packet, data):
             ? track changes in buffer size max
             TODO add keys
         """
-        win_ratio = global_c_dict.get('tcp.win_ratio')
+        win_shift = global_c_dict.get('tcp.window.ratio')
         ## Find the general ip based value
-        if win_ratio is None:
+        if win_shift is None:
             # TODO add the keys
-            win_ratio = data[
+            win_shift = data[
                     TMdef.GLOBAL
                     ][
                     TMdef.ATTACK
@@ -538,17 +551,17 @@ def tcp_win(packet, data):
                         'ip_src_old'
                         ]
                     )
-            if win_ratio is not None:
-                win_ratio = win_ratio.get('win_ratio')
+            if win_shift is not None:
+                win_shift = win_shift.get('tcp.window.shift')
         ## Find default value
-        if win_ratio is None:
-            win_ratio = data[
+        if win_shift is None:
+            win_shift = data[
                     TMdef.GLOBAL
                     ][
                     TMdef.ATTACK
                     ][
-                    'tcp.defaults.win_ratio']
-        win = old_win * win_ratio
+                    'tcp.defaults.win_shift']
+        win = old_win + win_shift
     
     packet.setfieldval('window', win)
 
@@ -933,7 +946,7 @@ def tcp_get_global_dict_conversation_entry(packet, data):
     """
     r = None
     _data = data[TMdef.GLOBAL][TMdef.ATTACK]
-    _packet_dt = data[TMdef.PACKET]
+    _packet_dt = data[TMdef.PACKET]['tcp.conversation']
     for field in TCP_GLOBAL_CONV_FIELDS:
         val = _packet_dt.get(field)
         r = _data.get(val)

@@ -33,7 +33,7 @@ def recalculate_win_size(global_rwdict):
     ip_dict = global_rwdict[TMdef.TARGET]['ip_address_map']
     win_dict = global_rwdict[TMdef.TARGET]['win_size_map']
     for ip_old, ip_new in ip_dict.items():
-        if ip_old not in global_rwdict[TMdef.TARGET]['ttl_exceptions']:
+        if ip_old not in global_rwdict[TMdef.TARGET]['win_size_exceptions']:
             win_dist = global_rwdict.statistics.get_win_distribution(ip_new)
             if len(win_dist) > 0:
                 win_prob_dict = lea.Lea.fromValFreqsDict(win_dist)
@@ -51,7 +51,7 @@ def recalculate_mss(global_rwdict):
     ip_dict = global_rwdict[TMdef.TARGET]['ip_address_map']
     mss_dict = global_rwdict[TMdef.TARGET]['mss_map']
     for ip_old, ip_new in ip_dict.items():
-        if ip_old not in global_rwdict[TMdef.TARGET]['ttl_exceptions']:
+        if ip_old not in global_rwdict[TMdef.TARGET]['mss_exceptions']:
             mss_dist = global_rwdict.statistics.get_mss_distribution(ip_new)
             if len(mss_dist) > 0:
                 mss_prob_dict = lea.Lea.fromValFreqsDict(mss_dist)

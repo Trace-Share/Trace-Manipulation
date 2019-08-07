@@ -1,6 +1,7 @@
 from .. import Definitions as TMdef
 
 import numbers
+import re
 
 
 ipv4_regex = re.compile(r'((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))')
@@ -24,7 +25,7 @@ mac_regex = re.compile(r'([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})')
 ###########################################
 
 
-def validate_ip_map(data, verbose=False):
+def validate_mac_map(data, verbose=False):
     """
     Tests if dictionary contains
 

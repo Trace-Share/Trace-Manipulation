@@ -363,4 +363,4 @@ def make_random_treshold(data, config):
         ## required by random delay/oscilation functions
         threshold = dict_ref.get('random.threshold')
         if threshold:
-            rewrap.data_dict[TMdef.GLOBAL]['timestamp_threshold'] = threshold
+            data['timestamp_threshold'] = threshold
