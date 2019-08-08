@@ -287,7 +287,7 @@ def change_timestamp_function(rewrapper, name):
 
         preprocess = record.get(PREPROCESSING)
         if preprocess:
-            rewrapper.enqueue_timestamp_postprocess(preprocess)
+            rewrapper.enqueue_timestamp_preprocess(preprocess)
 
         alt = record.get(ALT)
         if alt:

@@ -150,7 +150,7 @@ class ReWrapper(object):
         self.timestamp_function = function
 
 
-    def enqueue_timestamp_postprocess(self, function):
+    def enqueue_timestamp_preprocess(self, function):
         """
         Enqueues preprocessing function that is applied after main timestamp generator function.
         
