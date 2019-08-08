@@ -16,7 +16,7 @@ class TMReWrapper(unittest.TestCase):
         Sub.subscribe_protocol_transformation({'test' : entry})
 
         self.assertTrue(len(Sub.subsribed_functions.keys()) == 1)
-        self.assertTrue(Sub.subsribed_functions.values()[0] is entry)
+        self.assertTrue(list(Sub.subsribed_functions.values())[0] is entry)
         self.assertTrue(entry[Sub.PROCESSING](None, None) == 0 )
         self.assertTrue(entry[Sub.PREPROCESSING](None, None) == 1 )
         self.assertTrue(entry[Sub.VALIDATION](None, None) == 2 )
