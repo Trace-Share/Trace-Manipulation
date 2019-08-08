@@ -12,6 +12,8 @@ import scapy.utils
 
 import scapy_extend.http as http
 
+import scapy.all as scapy
+
 from ..transf import PacketProcessing as TMpp
 from ..transf import TimestampGeneration as TMtg
 from ..transf import RecalTMdict as TMrc
@@ -471,6 +473,12 @@ timestamp_function_dict = { # dictionary of known timestamp generation functions
 }
 , 'tcp_avg_shift' : {
     FUNCTION : TMtg.timestamp_tcp_avg_shift
+    , PREPROCESSING : (
+        lambda packet, data, previous_timestamp_old, previous_timestamp_new,
+         current_timestamp_old, new_timestamp : 
+         new_timestamp if TMpp.if_has_protocol_else_default(scapy.IP, TMpp.get_new_ips,
+          None, packet, data) is None else new_timestamp
+    )
     , ALT : TMtg.timestamp_dynamic_shift
     , FILL : [
         Filler.make_attack_tcp_avg_delay_map

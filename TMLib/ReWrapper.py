@@ -55,6 +55,7 @@ class ReWrapper(object):
         self.process_dict = {} # processing functions chosen for layers
         self.postprocess_dict = {} # postrprocessing function chosen for layers
 
+        self.timestamp_preprocess = []
         self.timestamp_function = None
         self.timestamp_postprocess = []
         self.data_dict[TMdef.GLOBAL]['generate_timestamp_function_alt'] = None
@@ -147,6 +148,27 @@ class ReWrapper(object):
         if not function:
             raise TypeError('NoneType passed as timestamp generator function.')
         self.timestamp_function = function
+
+
+    def enqueue_timestamp_postprocess(self, function):
+        """
+        Enqueues preprocessing function that is applied after main timestamp generator function.
+        
+        Function must have these parameters:
+            packet - current packet
+            data - data dict
+            previous_timestamp_old - original timestamp of previous packet
+            previous_timestamp_new - final (after application of all functions) generated timestamp of the previous packte
+            current_timestamp_old - original timestamp of the current packet
+            new_timestamp - new (after application of all previous functions) timestamp of the current packet,
+                            if none was applied then current_timestamp_old == new_timestamp
+        Function must return new timestamp value and returned_value >= previous_timestamp_new must hold.
+
+        :param function: name of the function. If such name is found, it will append the function.
+        """
+        if not function:
+            raise TypeError('NoneType passed as timestamp postprocess function.')
+        self.timestamp_preprocess.append(function)
 
 
     def set_backup_timestamp_generator(self, function):
@@ -283,6 +305,12 @@ class ReWrapper(object):
             ## IF this is the first packet, only shift
             new_timestamp = packet.time + data[TMdef.GLOBAL][TMdef.ATTACK]['timestamp_shift']
         else: ## Test every timestamp if new_timestamp >= previous_timestamp_new
+            ## Apply PreProcess function
+            for f in self.timestamp_preprocess:
+                new_timestamp = test_generated_timestamp_order(previous_timestamp_new,
+                    f(packet, data, previous_timestamp_old, previous_timestamp_new, current_timestamp_old, new_timestamp),
+                    f,
+                    new_timestamp)
             ## Apply base timestamp generation function
             new_timestamp = test_generated_timestamp_order(previous_timestamp_new,
                 self.timestamp_function(packet, data, previous_timestamp_old, previous_timestamp_new, current_timestamp_old, new_timestamp),

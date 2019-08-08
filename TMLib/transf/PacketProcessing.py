@@ -976,3 +976,11 @@ def tcp_get_conversation_dict(packet, data):
     dc = find_or_make(dc, sport, _type=(lambda: sc))
 
     return dc
+
+
+def if_has_protocol_else_default(protocol, f, default, packet, data):
+    try:
+        return f(packet[protocol], data)
+    except IndexError:
+        return default
+
