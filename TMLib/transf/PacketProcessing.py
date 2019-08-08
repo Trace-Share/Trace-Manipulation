@@ -471,7 +471,7 @@ def tcp_win(packet, data):
     TODO Define query to export minimum
     """
     c_dict = tcp_get_conversation_dict(packet, data)
-    congestion_control = c_dict['congestion_control'] # TODO determine if useful
+    # congestion_control = c_dict['congestion_control'] # TODO determine if useful
     global_c_dict = tcp_get_global_dict_conversation_entry(packet, data)
 
     conversation_state = c_dict['conversation.state']
@@ -481,7 +481,9 @@ def tcp_win(packet, data):
     if conversation_state in IRW_STATES:
         # TODO set Initial Window
         ## Find conversation specific value
-        win = global_c_dict.get('tcp.window.irw')
+        win=None
+        if global_c_dict is not None:
+            win = global_c_dict.get('tcp.window.irw')
         ## Find the general ip based value
         if win is None:
             # TODO add the keys
@@ -504,7 +506,8 @@ def tcp_win(packet, data):
         if win is not None:
             _w = win.get(old_win)
             if _w is None:
-                win = win.get('default')
+                _w = win.get('default')
+            win = _w
 
         ## Find default value
         if win is None:
@@ -538,7 +541,9 @@ def tcp_win(packet, data):
             ? track changes in buffer size max
             TODO add keys
         """
-        win_shift = global_c_dict.get('tcp.window.ratio')
+        win_shift = None
+        if global_c_dict is not None:
+            win_shift = global_c_dict.get('tcp.window.shift')
         ## Find the general ip based value
         if win_shift is None:
             # TODO add the keys
@@ -928,17 +933,21 @@ def get_ip_dst(packet, data):
     else:
         data[TMdef.PACKET]['ip_dst_new'] = ip_org
 
-TCP_GLOBAL_CONV_FIELDS = ['ip_src_old', 'ip_dst_old', 'sport', 'dport']
+TCP_GLOBAL_CONV_FIELDS = [
+    lambda pkt, dt: dt.get('ip_src_old')
+    , lambda pkt, dt : dt.get('ip_dst_old')
+    , lambda pkt, dt : pkt.getfieldval('sport')
+    , lambda pkt, dt : pkt.getfieldval('dport')
+]
 def tcp_get_global_dict_conversation_entry(packet, data):
     """
     TODO Finish description
     """
-    r = None
-    _data = data[TMdef.GLOBAL][TMdef.ATTACK]
-    _packet_dt = data[TMdef.PACKET]['tcp.conversation']
+    r = data[TMdef.GLOBAL][TMdef.ATTACK]['tcp.conversation']
+    _packet_dt = data[TMdef.PACKET]
     for field in TCP_GLOBAL_CONV_FIELDS:
-        val = _packet_dt.get(field)
-        r = _data.get(val)
+        val = field(packet,_packet_dt)
+        r = r.get(val)
         if val is None or r is None:
             return None
     return r

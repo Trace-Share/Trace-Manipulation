@@ -334,6 +334,7 @@ class ConversationRWdict(dict):
         dict.__init__(self,*args,**kwargs)
         self.update = {
         'timestamp_next_pkt' : 0
+        , 'tcp.conversation' : {}
         }
         ## stores functions meant to validate that the required fields exist
         self.validation_functions = []

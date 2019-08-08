@@ -403,6 +403,42 @@ def make_tcp_window_map(data, config):
     if config_tcp_window is None:
         return
 
+    """
+    {
+        tcp.window.config : {
+            defaults : {
+                tcp.window.shift : + 100
+                , tcp.window.irw : [
+                    {
+                        irw.from : default
+                        , irw.to : 10000
+                    }
+                ]
+            }
+            , conversation : [
+                {
+                    ip.source : 0.0.0.0
+                    , ip.destination : 0.0.0.0
+                    , ports : [
+                        {
+                            port.source : 0
+                            , port.destination : 0
+                            , counter.handshake.first_two : []
+                            , tcp.window.shift : 0
+                            , tcp.window.irw : {
+                                default : 0
+                                , map : [
+                                    from : 0
+                                    , to : 0
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    """
     config_defaults = config_tcp_window.get('defaults')
     if config_defaults is not None:
         defaults_shift = config_defaults.get('tcp.window.shift')
