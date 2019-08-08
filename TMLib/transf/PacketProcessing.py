@@ -806,12 +806,11 @@ def dns_change_ips(packet, data):
     :param data: dict containing TMLib.TMdict dictionaries
     """
     # TODO investigate missing variable
-    qr = packet.getfieldval('qr') # question/response
-    count = packet.getfieldval(qdcount)
-    if count > 0:
-        resources = packet.getfieldval('qd')
-        for i in range(count):
-            resource = resources[i] 
+    # qr = packet.getfieldval('qr') # question/response
+    # count = packet.getfieldval(qdcount)
+    resources = packet.getfieldval('qd')
+    if resources is not None:
+        for resource in resources: 
             if 12 == resource.getfieldval('qtype'):
                 tmp = resource.getfieldval('qname')
                 if isinstance(tmp, bytes):
@@ -824,30 +823,29 @@ def dns_change_ips(packet, data):
                         resource.setfieldval('qname', ip_new)
 
     for i in range(3):
-        count = packet.getfieldval(rcount[i])
-        if count > 0:
-            resources = packet.getfieldval(rname[i])
-            for j in range(count):
-                resource = resources[j]
-                qtype = resource.getfieldval('type')
-                if qtype == 1 or qtype == 28:
-                    ip_new = data[TMdef.GLOBAL][TMdef.TARGET]['ip_address_map'].get(resource.getfieldval('rdata'))
+        resources = packet.getfieldval(rname[i])
+        if resources is None:
+            continue
+        for resource in resources:
+            qtype = resource.getfieldval('type')
+            if qtype == 1 or qtype == 28:
+                ip_new = data[TMdef.GLOBAL][TMdef.TARGET]['ip_address_map'].get(resource.getfieldval('rdata'))
+                if ip_new:
+                    resource.setfieldval('rdata', ip_new)
+            if qtype == 99:
+                ip_map = data[TMdef.GLOBAL][TMdef.TARGET]['ip_address_map']
+                tmp_data = ipv4_regex.sub(lambda m: ip_map.get(m.group(), m.group()), resource.getfieldval('rdata'))
+                resource.setfieldval('rdata', ipv6_regex.sub(lambda m: ip_map.get(m.group(), m.group()), tmp_data))
+            if qtype == 12:
+                tmp = resource.getfieldval('rrname')
+                if isinstance(tmp, bytes):
+                    ip_new = dns_reverlookup_update( tmp.decode('utf-8'), data)
                     if ip_new:
-                        resource.setfieldval('rdata', ip_new)
-                if qtype == 99:
-                    ip_map = data[TMdef.GLOBAL][TMdef.TARGET]['ip_address_map']
-                    tmp_data = ipv4_regex.sub(lambda m: ip_map.get(m.group(), m.group()), resource.getfieldval('rdata'))
-                    resource.setfieldval('rdata', ipv6_regex.sub(lambda m: ip_map.get(m.group(), m.group()), tmp_data))
-                if qtype == 12:
-                    tmp = resource.getfieldval('rrname')
-                    if isinstance(tmp, bytes):
-                        ip_new = dns_reverlookup_update( tmp.decode('utf-8'), data)
-                        if ip_new:
-                            resource.setfieldval('rrname', bytes(ip_new,'utf-8'))
-                    else:
-                        ip_new = dns_reverlookup_update( tmp, data)
-                        if ip_new:
-                            resource.setfieldval('rrname', ip_new)
+                        resource.setfieldval('rrname', bytes(ip_new,'utf-8'))
+                else:
+                    ip_new = dns_reverlookup_update( tmp, data)
+                    if ip_new:
+                        resource.setfieldval('rrname', ip_new)
 
 
 ###############################################
