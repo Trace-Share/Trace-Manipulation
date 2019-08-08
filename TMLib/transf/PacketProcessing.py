@@ -9,6 +9,7 @@ import scapy_extend.http as http
 import re
 
 from .. import Definitions as TMdef
+from ..utils.utils import find_or_make
 
 
 #########################################
@@ -518,7 +519,9 @@ def tcp_win(packet, data):
             if _w is None:
                 ## This should raise exception if missing
                 ## dont use .get()
-                win = win['default']
+                win = win.get('default')
+                if win is None:
+                    win = old_win
         
 
     # TODO add window changes
@@ -560,7 +563,10 @@ def tcp_win(packet, data):
                     ][
                     TMdef.ATTACK
                     ][
-                    'tcp.defaults.win_shift']
+                    'tcp.defaults'
+                    ][
+                    'tcp.window.shift'
+                    ]
         win = old_win + win_shift
     
     packet.setfieldval('window', win)
@@ -866,21 +872,6 @@ def httpv1_regex_ip_swap(packet, data):
 ###############################################
 ################## Helpers
 ###############################################
-
-def find_or_make(_dict, key, _type=dict):
-    """
-    Finds entry in dictionary, or creates it and adds it to dictionary.
-
-    :param _dict: dictionary
-    :param key: key in dictionary
-    :param _type: values type (will be used to construct new value)
-    :return: Value for key
-    """
-    r = _dict.get(key)
-    if r is None:
-        r = _type()
-        _dict[key] = r
-    return r
 
 def globalRWdict_findMatch(data, field, key):
     """

@@ -1,6 +1,7 @@
 import numbers
 
 from .. import Definitions as TMdef 
+from ..utils.utils import find_or_make
 
 def make_attack_tcp_avg_delay_map(data, config):
     """
@@ -364,3 +365,166 @@ def make_random_treshold(data, config):
         threshold = dict_ref.get('random.threshold')
         if threshold:
             data['timestamp_threshold'] = threshold
+
+def init_tcp_window_map(data, config):
+    """
+
+    :param data: dict containing TMLib.TMdict dictionaries
+    :param config: config file parsed as dict
+    """
+    global_dict = data.get(TMdef.GLOBAL)
+    if not global_dict or not isinstance(global_dict, dict):
+        return
+    atk_dict = global_dict[TMdef.ATTACK]
+    tcp_defaults = find_or_make(atk_dict, 'tcp.defaults')
+    
+    if tcp_defaults.get('tcp.window.shift') is None:
+        tcp_defaults['tcp.window.shift'] = 0
+    if tcp_defaults.get('tcp.window.irw') is None:
+        tcp_defaults['tcp.window.irw'] = {
+            'default' : 8192 # win ? TODO add more
+        }
+
+def make_tcp_window_map(data, config):
+    """
+
+    :param data: dict containing TMLib.TMdict dictionaries
+    :param config: config file parsed as dict
+    """
+    global_dict = data.get(TMdef.GLOBAL)
+    if not global_dict or not isinstance(global_dict, dict):
+        return
+    atk_dict = global_dict[TMdef.ATTACK]
+    tcp_conversation = find_or_make(atk_dict, 'tcp.conversation')
+    tcp_defaults_ip_map = find_or_make(atk_dict, 'tcp.defaults.ip_map')
+    tcp_defaults = find_or_make(atk_dict, 'tcp.defaults')
+
+    config_tcp_window = config.get('tcp.window.config')
+    if config_tcp_window is None:
+        return
+
+    config_defaults = config_tcp_window.get('defaults')
+    if config_defaults is not None:
+        defaults_shift = config_defaults.get('tcp.window.shift')
+        if defaults_shift is not None:
+            tcp_defaults['tcp.window.shift'] = defaults_shift
+        defaults_irw = config_defaults.get('tcp.window.irw')
+        if defaults_irw is not None:
+            defaults_irw_map = {}
+            for mapping in defaults_irw:
+                defaults_irw_map[mapping['irw.from']] = mapping['irw.to']
+            tcp_defaults['tcp.window.irw'].update(defaults_irw_map)
+        defaults_irw_del = config_defaults.get('tcp.window.irw.del')
+        if defaults_irw_del is not None:
+            _tcp_defaults_irw = tcp_defaults['tcp.window.irw']
+            for key in defaults_irw_del:
+                try:
+                    del _tcp_defaults_irw[key]
+                except KeyError:
+                    continue
+    
+    config_defaults_ip_map = config_tcp_window.get('defaults.ip_map')
+    if config_defaults_ip_map is not None:
+        for entry in config_defaults_ip_map:
+            mapping =  {}
+            tcp_defaults_ip_map[entry['ip.src']]
+            entry_shift = entry.get('tcp.window.shift')
+            if entry_shift is not None:
+                mapping['tcp.window.shift'] = entry_shift
+            entry_handshake = entry.get('counter.handshake_first_two')
+            if entry_handshake is not None:
+                mapping['counter.handshake.first_two'] = entry_handshake
+            entry_irw_map = entry.get('tcp.window.irw')
+            if entry_irw_map is None:
+                continue
+            irw_mapping = {}
+            mapping['tcp.window.irw']
+            entry_default = entry_irw_map.get('default')
+            if entry_default is not None:
+                irw_mapping['default'] = entry_default
+            entry_irw_map = entry_irw_map.get('map')
+            if entry_irw_map is None:
+                continue
+            for e in entry_irw_map:
+                irw_mapping[e['from']] = e['to']
+    
+    config_conversations = config_tcp_window.get('conversation')
+    if config_conversations is None:
+        return
+
+    
+    for entry in config_conversations:
+        ip_src = entry['ip.source']
+        ip_dst = entry['ip.destination']
+        _map = find_or_make(tcp_conversation, ip_src)
+        _map = find_or_make(_map, ip_dst)
+        for port in entry.get('port'):
+            port_src = port['port.source']
+            port_dst = port['port.destination']
+            _map = find_or_make(_map, port_src)
+            _map = find_or_make(_map, port_dst)
+            counter_handshake = port.get('counter.handshake.first_two')
+            if counter_handshake is not None:
+                _map['counter.handshake.first_two'] = counter_handshake
+            window_shift = port.get('tcp.window.shift')
+            if window_shift is not None:
+                _map['tcp.window.shift'] = window_shift
+            window_irw = port.get('tcp.window.irw')
+            if window_irw is None:
+                continue
+            _irw = {}
+            _map['tcp.window.irw'] = _irw
+            default = window_irw.get('default')
+            if default is not None:
+                _irw['default'] = default
+            window_irw = window_irw.get('map')
+            if window_irw is None:
+                continue
+            for entry in window_irw:
+                _irw[entry['from']] = entry['to']
+
+
+            
+
+    
+
+    
+
+"""
+TODO improve validation and filling (?)
+
+{
+    "name" : ""
+    , "type" : ""
+    , "data" : ""
+    , "validation" : ""
+    , "loader" : ""
+    # -> .parent -> obj
+    # -> .children -> (list, dict , val, None)
+    # -> .type -> ("dict", "list", "key", "val")
+    # -> .name -> (None, None, "key", "val")
+    # -> .validation -> callable
+    # -> .loader -> callable
+}
+
+->
+
+{
+    "key" : "val"
+}
+
+{
+    "key" : [
+        "val"
+    ]
+}
+
+{
+    "key" : [
+        {
+            "key" : "val"
+        }
+    ]
+}
+"""
+    

@@ -81,3 +81,18 @@ def donothing(*args):
     """
     pass
 
+def find_or_make(_dict, key, _type=dict):
+    """
+    Finds entry in dictionary, or creates it and adds it to dictionary.
+
+    :param _dict: dictionary
+    :param key: key in dictionary
+    :param _type: values type (will be used to construct new value)
+    :return: Value for key
+    """
+    r = _dict.get(key)
+    if r is None:
+        r = _type()
+        _dict[key] = r
+    return r
+
