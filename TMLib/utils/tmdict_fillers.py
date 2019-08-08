@@ -482,12 +482,6 @@ def make_tcp_window_map(data, config):
                 continue
             for entry in window_irw:
                 _irw[entry['from']] = entry['to']
-
-
-            
-
-    
-
     
 
 """
