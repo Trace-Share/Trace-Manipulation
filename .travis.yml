@@ -1,0 +1,17 @@
+---
+
+dist: xenial
+
+language: python
+python: 
+  - '3.7'
+
+before_install:
+    - sudo apt-get update -qq
+
+install:
+    # Install requirements
+    - pip install -r requirements.txt
+
+script:
+    - ./run_tests.sh
