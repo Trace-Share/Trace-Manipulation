@@ -285,6 +285,10 @@ def change_timestamp_function(rewrapper, name):
     if record :
         rewrapper.set_timestamp_generator(record[FUNCTION])
 
+        preprocess = record.get(PREPROCESSING)
+        if preprocess:
+            rewrapper.enqueue_timestamp_postprocess(preprocess)
+
         alt = record.get(ALT)
         if alt:
             if isinstance(alt, str):

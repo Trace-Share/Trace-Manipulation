@@ -456,6 +456,7 @@ Single entry in timestamp_function_dict represents single timestamp generation f
 An entry in timestamp_function_dict must have:
 key - unique string name
 value - these possible keys
+    PREPROCESSING - timestamp preprocess function
     FUNCTION - contains timestamp generator function 
     ALT - contains backup/alternative timestamp generation function. 
         If value is string, timestamp_alt_function_dict will be searched.
