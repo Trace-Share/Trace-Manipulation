@@ -297,7 +297,7 @@ subsribed_functions = { # dictionary of known transformation functions
     PROCESSING : [
         {
         PROTOCOL : inet.TCP
-        , FUNCTION : TMpp.tcp_win_size_change
+        , FUNCTION : TMpp.tcp_win # tcp_win_size_change
         }
     ]
     , PREPROCESSING : [ 
@@ -309,11 +309,17 @@ subsribed_functions = { # dictionary of known transformation functions
         PROTOCOL : inet6.IPv6
         , FUNCTION : TMpp.get_new_ips
         }
+        , {
+        PROTOCOL : inet.TCP
+        , FUNCTION : TMpp.tcp_conversation_tracker
+        }
     ]
     , FILL : [
         Filler.make_ip_map
         , Filler.make_win_ip_exceptions
         , Filler.make_port_ip_map
+        , Filler.init_tcp_window_map
+        , Filler.make_tcp_window_map
     ]
     , RECALCULATION : [
         TMrc.recalculate_win_size
