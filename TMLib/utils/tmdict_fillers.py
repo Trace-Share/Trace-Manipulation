@@ -436,6 +436,16 @@ def make_tcp_window_map(data, config):
                     ]
                 }
             ]
+            , defaults.ip_map : [
+                {
+                    ip.src : 0.0.0.0
+                    , counter.handshake_first_two : []
+                    , tcp.window.shift : 0
+                    , tcp.window.irw : {
+                        'default' : 0
+                    }
+                }
+            ]
         }
     }
     """
@@ -463,7 +473,7 @@ def make_tcp_window_map(data, config):
     if config_defaults_ip_map is not None:
         for entry in config_defaults_ip_map:
             mapping =  {}
-            tcp_defaults_ip_map[entry['ip.src']]
+            tcp_defaults_ip_map[entry['ip.src']] = mapping
             entry_shift = entry.get('tcp.window.shift')
             if entry_shift is not None:
                 mapping['tcp.window.shift'] = entry_shift
@@ -474,7 +484,7 @@ def make_tcp_window_map(data, config):
             if entry_irw_map is None:
                 continue
             irw_mapping = {}
-            mapping['tcp.window.irw']
+            mapping['tcp.window.irw'] = irw_mapping
             entry_default = entry_irw_map.get('default')
             if entry_default is not None:
                 irw_mapping['default'] = entry_default
