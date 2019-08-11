@@ -135,7 +135,7 @@ def build_mock_dict():
     }
     data[TMdef.GLOBAL] = tmp
     data[TMdef.CONVERSATION] = {
-        'tcp.conversation' : {
+        'tcp.conversations' : {
             '181.149.152.176' : {
                 '80.142.128.2' : {
                     1313 : {
