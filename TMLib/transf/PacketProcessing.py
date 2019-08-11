@@ -968,7 +968,7 @@ def tcp_get_conversation_dict(packet, data):
     src = data[TMdef.PACKET]['ip_src_old']
     dst = data[TMdef.PACKET]['ip_dst_old']
 
-    conversations = find_or_make( data[TMdef.CONVERSATION], 'tcp.conversatios' )
+    conversations = find_or_make( data[TMdef.CONVERSATION], 'tcp.conversations' )
     
     ## can create new dictionary
     sc = find_or_make(conversations, src)
