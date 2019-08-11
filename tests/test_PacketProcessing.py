@@ -516,7 +516,7 @@ class TMPacketProcessing(unittest.TestCase):
         data[
             TMdef.CONVERSATION
             ][
-            'tcp.conversation'
+            'tcp.conversations'
             ][
             '181.149.152.176'
             ][
@@ -586,7 +586,7 @@ class TMPacketProcessing(unittest.TestCase):
         data[
             TMdef.CONVERSATION
             ][
-            'tcp.conversation'
+            'tcp.conversations'
             ][
             '181.149.152.176'
             ][
@@ -656,7 +656,7 @@ class TMPacketProcessing(unittest.TestCase):
         data[
             TMdef.CONVERSATION
             ][
-            'tcp.conversation'
+            'tcp.conversations'
             ][
             '181.149.152.176'
             ][
