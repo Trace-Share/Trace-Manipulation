@@ -658,9 +658,9 @@ class TMPacketProcessing(unittest.TestCase):
             ][
             'tcp.conversations'
             ][
-            '181.149.152.176'
+            '107.149.218.168'
             ][
-            '80.142.128.2'
+            '181.149.152.176'
             ][
             1313
             ][
