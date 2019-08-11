@@ -479,7 +479,7 @@ class TMPacketProcessing(unittest.TestCase):
         data[TMdef.PACKET]['ip_src_old'] = src_ref
         data[TMdef.PACKET]['ip_dst_old'] = dst_ref
 
-        pp.tcp_win(ref_pkt, data)
+        pp.tcp_win(test_pkt, data)
 
         self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
@@ -496,7 +496,7 @@ class TMPacketProcessing(unittest.TestCase):
         data[TMdef.PACKET]['ip_src_old'] = src_ref
         data[TMdef.PACKET]['ip_dst_old'] = dst_ref
 
-        pp.tcp_win(ref_pkt, data)
+        pp.tcp_win(test_pkt, data)
 
         self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
@@ -529,7 +529,7 @@ class TMPacketProcessing(unittest.TestCase):
             'conversation.state'
             ] = 'conv'
 
-        pp.tcp_win(ref_pkt, data)
+        pp.tcp_win(test_pkt, data)
 
         self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
@@ -547,7 +547,7 @@ class TMPacketProcessing(unittest.TestCase):
         data[TMdef.PACKET]['ip_src_old'] = src_ref
         data[TMdef.PACKET]['ip_dst_old'] = dst_ref
 
-        pp.tcp_win(ref_pkt, data)
+        pp.tcp_win(test_pkt, data)
 
         self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
@@ -565,7 +565,7 @@ class TMPacketProcessing(unittest.TestCase):
         data[TMdef.PACKET]['ip_src_old'] = src_ref
         data[TMdef.PACKET]['ip_dst_old'] = dst_ref
 
-        pp.tcp_win(ref_pkt, data)
+        pp.tcp_win(test_pkt, data)
 
         self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
@@ -599,7 +599,7 @@ class TMPacketProcessing(unittest.TestCase):
             'conversation.state'
             ] = 'conv'
 
-        pp.tcp_win(ref_pkt, data)
+        pp.tcp_win(test_pkt, data)
 
         self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
@@ -617,7 +617,7 @@ class TMPacketProcessing(unittest.TestCase):
         data[TMdef.PACKET]['ip_src_old'] = src_ref
         data[TMdef.PACKET]['ip_dst_old'] = dst_ref
 
-        pp.tcp_win(ref_pkt, data)
+        pp.tcp_win(test_pkt, data)
 
         self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
@@ -635,7 +635,7 @@ class TMPacketProcessing(unittest.TestCase):
         data[TMdef.PACKET]['ip_src_old'] = src_ref
         data[TMdef.PACKET]['ip_dst_old'] = dst_ref
 
-        pp.tcp_win(ref_pkt, data)
+        pp.tcp_win(test_pkt, data)
 
         self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
@@ -669,7 +669,7 @@ class TMPacketProcessing(unittest.TestCase):
             'conversation.state'
             ] = 'conv'
 
-        pp.tcp_win(ref_pkt, data)
+        pp.tcp_win(test_pkt, data)
 
         self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
