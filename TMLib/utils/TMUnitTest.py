@@ -93,9 +93,61 @@ def build_mock_dict():
         , 'tcp_avg_delay_map' : {}
         , 'timestamp_delay_map' : {}
         , 'timestamp_delay_set' : set()
+        , 'tcp.conversation' : {
+            '181.149.152.176' :
+                {
+                    '80.142.128.2' : {
+                        1313 : {
+                            1212 : {
+                                'counter.handshake.first_two' : [
+                                    0,
+                                    1
+                                ]
+                                , 'tcp.window.irw' : {
+                                    'default' : 1
+                                    , 2 : 3
+                                    , 4 : 5
+                                }
+                                , 'tcp.window.shift' : 111
+                            }
+                        }
+                    }
+                }
+        }
+        , 'tcp.defaults.ip_map' : {
+            '80.142.128.2' : {
+                'tcp.window.irw' : {
+                    'default' : 10
+                    , 2 : 30
+                    , 4 : 50
+                }
+                , 'tcp.window.shift' : 222
+            }
+        }
+        , 'tcp.defaults' : {
+            'tcp.window.irw' : {
+                'default' : 100
+                , 2 : 300
+                , 4 : 500
+            }
+            , 'tcp.window.shift' : 333
+        }
     }
     data[TMdef.GLOBAL] = tmp
-    data[TMdef.CONVERSATION] = dict()
+    data[TMdef.CONVERSATION] = {
+        'tcp.conversation' : {
+            '181.149.152.176' : {
+                '80.142.128.2' : {
+                    1313 : {
+                        1212 : {
+                            'counter' : 0
+                            , 'conversation.state' : 'init'
+                        }
+                    }
+                }
+            }
+        }
+    }
     data[TMdef.PACKET] = dict()
 
 

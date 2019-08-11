@@ -467,6 +467,214 @@ class TMPacketProcessing(unittest.TestCase):
         self.assertTrue( lib.compare_mac_pkts(ref_pkt, mac_pkt), msg= (str(ref_pkt) + ' == ' + str(mac_pkt)) )
 
 
+    def test_win_conv_default(self):
+        src_ref = '181.149.152.176'
+        dst_ref = '80.142.128.2'
+
+        test_pkt = inet.TCP(sport=1313,dport=1212,window=0)
+        ref_pkt = inet.TCP(sport=1313,dport=1212,window=1)
+        
+        data = lib.build_mock_dict()
+
+        data[TMdef.PACKET]['ip_src_old'] = src_ref
+        data[TMdef.PACKET]['ip_dst_old'] = dst_ref
+
+        pp.tcp_win(ref_pkt, data)
+
+        self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
+            msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
+    
+    def test_win_conv_specific(self):
+        src_ref = '181.149.152.176'
+        dst_ref = '80.142.128.2'
+
+        test_pkt = inet.TCP(sport=1313,dport=1212,window=2)
+        ref_pkt = inet.TCP(sport=1313,dport=1212,window=3)
+        
+        data = lib.build_mock_dict()
+
+        data[TMdef.PACKET]['ip_src_old'] = src_ref
+        data[TMdef.PACKET]['ip_dst_old'] = dst_ref
+
+        pp.tcp_win(ref_pkt, data)
+
+        self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
+            msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
+    
+    def test_win_conv_shift(self):
+        src_ref = '181.149.152.176'
+        dst_ref = '80.142.128.2'
+
+        test_pkt = inet.TCP(sport=1313,dport=1212,window=0)
+        ref_pkt = inet.TCP(sport=1313,dport=1212,window=111)
+        
+        data = lib.build_mock_dict()
+
+        data[TMdef.PACKET]['ip_src_old'] = src_ref
+        data[TMdef.PACKET]['ip_dst_old'] = dst_ref
+
+        data[
+            TMdef.CONVERSATION
+            ][
+            'tcp.conversation'
+            ][
+            '181.149.152.176'
+            ][
+            '80.142.128.2'
+            ][
+            1313
+            ][
+            1212
+            ][
+            'conversation.state'
+            ] = 'conv'
+
+        pp.tcp_win(ref_pkt, data)
+
+        self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
+            msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
+
+
+    def test_win_default_ip_map_default(self):
+        dst_ref = '181.149.152.176'
+        src_ref = '80.142.128.2'
+
+        test_pkt = inet.TCP(sport=1313,dport=1212,window=0)
+        ref_pkt = inet.TCP(sport=1313,dport=1212,window=10)
+        
+        data = lib.build_mock_dict()
+
+        data[TMdef.PACKET]['ip_src_old'] = src_ref
+        data[TMdef.PACKET]['ip_dst_old'] = dst_ref
+
+        pp.tcp_win(ref_pkt, data)
+
+        self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
+            msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
+
+
+    def test_win_default_ip_map_specific(self):
+        dst_ref = '181.149.152.176'
+        src_ref = '80.142.128.2'
+
+        test_pkt = inet.TCP(sport=1313,dport=1212,window=2)
+        ref_pkt = inet.TCP(sport=1313,dport=1212,window=30)
+        
+        data = lib.build_mock_dict()
+
+        data[TMdef.PACKET]['ip_src_old'] = src_ref
+        data[TMdef.PACKET]['ip_dst_old'] = dst_ref
+
+        pp.tcp_win(ref_pkt, data)
+
+        self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
+            msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
+    
+    
+    def test_win_default_ip_map_shift(self):
+        dst_ref = '181.149.152.176'
+        src_ref = '80.142.128.2'
+
+        test_pkt = inet.TCP(sport=1313,dport=1212,window=0)
+        ref_pkt = inet.TCP(sport=1313,dport=1212,window=222)
+        
+        data = lib.build_mock_dict()
+
+        data[TMdef.PACKET]['ip_src_old'] = src_ref
+        data[TMdef.PACKET]['ip_dst_old'] = dst_ref
+
+        data[
+            TMdef.CONVERSATION
+            ][
+            'tcp.conversation'
+            ][
+            '181.149.152.176'
+            ][
+            '80.142.128.2'
+            ][
+            1313
+            ][
+            1212
+            ][
+            'conversation.state'
+            ] = 'conv'
+
+        pp.tcp_win(ref_pkt, data)
+
+        self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
+            msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
+    
+    
+    def test_win_default_default(self):
+        dst_ref = '181.149.152.176'
+        src_ref = '107.149.218.168'
+
+        test_pkt = inet.TCP(sport=1313,dport=1212,window=0)
+        ref_pkt = inet.TCP(sport=1313,dport=1212,window=100)
+        
+        data = lib.build_mock_dict()
+
+        data[TMdef.PACKET]['ip_src_old'] = src_ref
+        data[TMdef.PACKET]['ip_dst_old'] = dst_ref
+
+        pp.tcp_win(ref_pkt, data)
+
+        self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
+            msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
+
+
+    def test_win_default_specific(self):
+        dst_ref = '181.149.152.176'
+        src_ref = '107.149.218.168'
+
+        test_pkt = inet.TCP(sport=1313,dport=1212,window=2)
+        ref_pkt = inet.TCP(sport=1313,dport=1212,window=300)
+        
+        data = lib.build_mock_dict()
+
+        data[TMdef.PACKET]['ip_src_old'] = src_ref
+        data[TMdef.PACKET]['ip_dst_old'] = dst_ref
+
+        pp.tcp_win(ref_pkt, data)
+
+        self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
+            msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
+    
+    
+    def test_win_default_ip_map_shift(self):
+        dst_ref = '181.149.152.176'
+        src_ref = '107.149.218.168'
+
+        test_pkt = inet.TCP(sport=1313,dport=1212,window=0)
+        ref_pkt = inet.TCP(sport=1313,dport=1212,window=333)
+        
+        data = lib.build_mock_dict()
+
+        data[TMdef.PACKET]['ip_src_old'] = src_ref
+        data[TMdef.PACKET]['ip_dst_old'] = dst_ref
+
+        data[
+            TMdef.CONVERSATION
+            ][
+            'tcp.conversation'
+            ][
+            '181.149.152.176'
+            ][
+            '80.142.128.2'
+            ][
+            1313
+            ][
+            1212
+            ][
+            'conversation.state'
+            ] = 'conv'
+
+        pp.tcp_win(ref_pkt, data)
+
+        self.assertTrue( lib.compare_mac_pkts(test_pkt, ref_pkt),
+            msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
+
+
 ###############################################
 ################## UDP
 ###############################################
