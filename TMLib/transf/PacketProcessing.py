@@ -981,7 +981,7 @@ def tcp_get_conversation_dict(packet, data):
     dc = find_or_make(dc, src)
     dc = find_or_make(dc, dport)
     dc = find_or_make(dc, sport, _type=(lambda: sc))
-
+    print(dc)
     return dc
 
 
