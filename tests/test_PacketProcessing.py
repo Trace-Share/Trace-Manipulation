@@ -641,7 +641,7 @@ class TMPacketProcessing(unittest.TestCase):
             msg=( '{}=={}'.format(str(ref_pkt), str(test_pkt)) ) )
     
     
-    def test_win_default_ip_map_shift(self):
+    def test_win_default_shift(self):
         dst_ref = '181.149.152.176'
         src_ref = '107.149.218.168'
 

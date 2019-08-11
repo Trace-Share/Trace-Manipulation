@@ -524,9 +524,11 @@ def tcp_win(packet, data):
             if _w is None:
                 ## This should raise exception if missing
                 ## dont use .get()
-                win = win.get('default')
-                if win is None:
-                    win = old_win
+                _w = win.get('default')
+            win = _w
+            
+            if win is None:
+                win = old_win
         
 
     # TODO add window changes
