@@ -539,8 +539,8 @@ class TMPacketProcessing(unittest.TestCase):
         dst_ref = '181.149.152.176'
         src_ref = '80.142.128.2'
 
-        test_pkt = inet.TCP(sport=1313,dport=1212,window=0)
-        ref_pkt = inet.TCP(sport=1313,dport=1212,window=10)
+        test_pkt = inet.TCP(sport=1212,dport=1313,window=0)
+        ref_pkt = inet.TCP(sport=1212,dport=1313,window=10)
         
         data = lib.build_mock_dict()
 
@@ -557,8 +557,8 @@ class TMPacketProcessing(unittest.TestCase):
         dst_ref = '181.149.152.176'
         src_ref = '80.142.128.2'
 
-        test_pkt = inet.TCP(sport=1313,dport=1212,window=2)
-        ref_pkt = inet.TCP(sport=1313,dport=1212,window=30)
+        test_pkt = inet.TCP(sport=1212,dport=1313,window=2)
+        ref_pkt = inet.TCP(sport=1212,dport=1313,window=30)
         
         data = lib.build_mock_dict()
 
@@ -575,8 +575,8 @@ class TMPacketProcessing(unittest.TestCase):
         dst_ref = '181.149.152.176'
         src_ref = '80.142.128.2'
 
-        test_pkt = inet.TCP(sport=1313,dport=1212,window=0)
-        ref_pkt = inet.TCP(sport=1313,dport=1212,window=222)
+        test_pkt = inet.TCP(sport=1212,dport=1313,window=0)
+        ref_pkt = inet.TCP(sport=1212,dport=1313,window=222)
         
         data = lib.build_mock_dict()
 

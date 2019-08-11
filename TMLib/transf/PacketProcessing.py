@@ -516,7 +516,9 @@ def tcp_win(packet, data):
                     ][
                     TMdef.ATTACK
                     ][
-                    'tcp.defaults.irw'
+                    'tcp.defaults'
+                    ][
+                    'tcp.window.irw'
                     ]
             _w = win.get(old_win)
             if _w is None:
@@ -969,19 +971,16 @@ def tcp_get_conversation_dict(packet, data):
     dst = data[TMdef.PACKET]['ip_dst_old']
 
     conversations = find_or_make( data[TMdef.CONVERSATION], 'tcp.conversations' )
-    
     ## can create new dictionary
     sc = find_or_make(conversations, src)
     sc = find_or_make(sc, dst)
     sc = find_or_make(sc, sport)
     sc = find_or_make(sc, dport)
-
     ## shares the same dictionary as source conversation
     dc = find_or_make(conversations, dst)
     dc = find_or_make(dc, src)
     dc = find_or_make(dc, dport)
     dc = find_or_make(dc, sport, _type=(lambda: sc))
-
     return dc
 
 
