@@ -133,16 +133,24 @@ def build_mock_dict():
             , 'tcp.window.shift' : 333
         }
     }
+    _conv = {
+        'counter' : 0
+        , 'conversation.state' : 'init'
+    }
     data[TMdef.GLOBAL] = tmp
     data[TMdef.CONVERSATION] = {
         'tcp.conversations' : {
             '181.149.152.176' : {
                 '80.142.128.2' : {
                     1313 : {
-                        1212 : {
-                            'counter' : 0
-                            , 'conversation.state' : 'init'
-                        }
+                        1212 : _conv
+                    }
+                }
+            }
+            , '80.142.128.2' : {
+                '181.149.152.176' : {
+                    1212 : {
+                        1313 : _conv
                     }
                 }
             }
