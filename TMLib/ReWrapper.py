@@ -337,6 +337,8 @@ class ReWrapper(object):
         
         ## Update timestamp data
         data[TMdef.CONVERSATION]['previous_timestamp_new'] = new_timestamp
+        data[TMdef.PACKET]['timestamp.current.new.afterpostprocess'] = new_timestamp
+        data[TMdef.PACKET]['timestamp.current.shift.afterpostprocess'] = new_timestamp - current_timestamp_old 
         return new_timestamp
 
 ##################################
