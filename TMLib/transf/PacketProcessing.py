@@ -366,10 +366,10 @@ def icmpv6MLReport2_change(packet, data):
     """
     records = packet.getfieldval('records')
     if records:
-        for i in len(records):
+        for record in records:
             # TODO FIX incorrect multicast record changes
-            ipv6_dst_change(packet, data)
-            icmpv6_sources_change(packet, data) 
+            ipv6_dst_change(record, data)
+            icmpv6_sources_change(record, data) 
 
 
 def icmpv6_lladdr_change(packet, data):
@@ -563,9 +563,6 @@ def tcp_win(packet, data):
         win = old_win + win_shift
     
     packet.setfieldval('window', win)
-
-
-
 
 
 def tcp_win_size_change(packet, data):
