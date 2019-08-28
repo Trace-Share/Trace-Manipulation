@@ -600,7 +600,7 @@ def tcp_timestamp_change(packet, data):
     opt_ts=None
     opt_i=None
     opt_txt=None
-    for i in len(options):
+    for i in range(len(options)):
         o=options[i]
         if o[0].lower() == 'timestamp':
             opt_ts = list(o[1])
