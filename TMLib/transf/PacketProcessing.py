@@ -598,9 +598,14 @@ def tcp_timestamp_change(packet, data):
     
     options = packet.getfieldval('options')
     opt_ts=None
-    for o in options:
+    opt_i=None
+    opt_txt=None
+    for i in len(options):
+        o=options[i]
         if o[0].lower() == 'timestamp':
-            opt_ts = o[1]
+            opt_ts = list(o[1])
+            opt_i = i
+            opt_txt=o[0]
     
     if opt_ts is None:
         return
@@ -615,6 +620,8 @@ def tcp_timestamp_change(packet, data):
         ## TODO Define better rules for unknown timestamp
         ts_echo_prev = max(timestamps.values())
     opt_ts[1] = ts_echo_prev
+
+    options[opt_i]= (opt_txt, tuple(opt_ts))
     
 
 def tcp_has_win_scale(packet, data):
