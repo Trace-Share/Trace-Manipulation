@@ -325,6 +325,14 @@ subsribed_functions = { # dictionary of known transformation functions
         TMrc.recalculate_win_size
     ]
 }
+, 'tcp_timestamp_change' : {
+    PROCESSING : [
+        {
+        PROTOCOL : inet.TCP
+        , FUNCTION : TMpp.tcp_timestamp_change
+        }
+    ]
+}
 , 'tcp_mss_change' : {
     PROCESSING : [
         {
