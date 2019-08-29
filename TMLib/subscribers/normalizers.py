@@ -172,7 +172,7 @@ subsribed_functions = { # dictionary of known transformation functions
     , PROCESSING : [
         {
         PROTOCOL : inet.CookedLinux
-        , FUNCTION : TMpp.mac_src_change
+        , FUNCTION : TMpp.cookedlinux_src_change
         }
     ]
     , FILL : [

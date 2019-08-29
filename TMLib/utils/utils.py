@@ -96,3 +96,6 @@ def find_or_make(_dict, key, _type=dict):
         _dict[key] = r
     return r
 
+def to_hex(i,l=4):
+    a = hex(i).replace('0x', '')
+    return '0'*(l-len(a))+a

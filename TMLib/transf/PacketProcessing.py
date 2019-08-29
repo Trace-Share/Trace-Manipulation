@@ -9,7 +9,7 @@ import scapy_extend.http as http
 import re
 
 from .. import Definitions as TMdef
-from ..utils.utils import find_or_make
+from ..utils.utils import find_or_make, to_hex
 
 
 #########################################
@@ -35,6 +35,25 @@ ipv6_regex = re.compile(r'((?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|\n'
 qdcount = 'qdcount'
 rcount = ['ancount', 'nscount', 'arcount']
 rname = ['an', 'ns', 'ar']
+
+#########################################
+############## Cooked Linux
+#########################################
+
+def cookedlinux_src_change(packet, data):
+    """
+    Changest mac src adress of packet based on mac adress map in data.
+    Data must be a dictionary containing entry mac_address_map that contains dictionary of adresses in form old_mac: new_mac
+
+    :param packet: Ether packet; expected scapy ether packet.
+    :param data: Dictionary containing entry mac_address_map containing mapping of mac adresses
+    """
+    mac_new = globalRWdict_findMatch(data, 'mac_address_map',
+        ':'.join([to_hex(i,l=2) for i in packet.getfieldval('src')[:-2]])
+    )
+    if mac_new:
+        packet.setfieldval('src', bytes.fromhex(mac_new.replace(':', '')) + '\x00\x00' )
+
 
 #########################################
 ############## Ether
