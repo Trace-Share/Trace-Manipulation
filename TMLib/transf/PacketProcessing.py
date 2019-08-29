@@ -52,7 +52,7 @@ def cookedlinux_src_change(packet, data):
         ':'.join([to_hex(i,l=2) for i in packet.getfieldval('src')[:-2]])
     )
     if mac_new:
-        packet.setfieldval('src', bytes.fromhex(mac_new.replace(':', '')) + '\x00\x00' )
+        packet.setfieldval('src', bytes.fromhex(mac_new.replace(':', '')) + b'\x00\x00' )
 
 
 #########################################
