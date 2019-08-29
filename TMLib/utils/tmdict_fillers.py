@@ -3,6 +3,24 @@ import numbers
 from .. import Definitions as TMdef 
 from ..utils.utils import find_or_make
 
+def make_tcp_timestamp_shift_map(data, config):
+    """
+    [
+        {
+            'ip': '0.0.0.0',
+            'shift' : 0.01
+        }
+    ]
+    """
+    atk = data[TMdef.GLOBAL][TMdef.ATTACK]
+    shift = find_or_make(atk, "tcp.timestamp.shift")
+
+    for entry in config['tcp.timestamp.shift']:
+        shift[entry['ip']] = entry['shift']
+    
+    atk["tcp.timestamp.shift.default"] = config["tcp.timestamp.shift.default"]
+
+
 def make_attack_tcp_avg_delay_map(data, config):
     """
     Fills TMdef.GLOBAL dictionary map of tcp handshake average delays (tcp_avg_delay_map)

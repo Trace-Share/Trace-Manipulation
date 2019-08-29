@@ -606,14 +606,18 @@ def tcp_timestamp_change(packet, data):
     
     if opt_ts is None:
         return
-    
-    timestamps= c_dict.get('timestamps')
+    ### TODO !!!!!!!!!!!!!!!!!111
+    ip_src_old = data[TMdef.PACKET]['ip_src_old']
+
+    timestamps= c_dict.get('tcp.timestamp.map')
     if timestamps is None:
         timestamps = {0:0}
-        c_dict['timestamps']=timestamps
+        c_dict['tcp.timestamp.map']=timestamps
         ## TODO Hardcoded normalization
-        c_dict['timestamps.shift']=0-opt_ts[0]
-    ts_shift=c_dict.get('timestamps.shift')
+    ts_shift=data[TMdef.GLOBAL][TMdef.ATTACK]['tcp.timestamp.shift'].get(
+        ip_src_old,
+        data[TMdef.GLOBAL][TMdef.ATTACK]['tcp.timestamp.shift']["tcp.timestamp.shift.default"]
+        )
 
     #ts_shift = int(data[TMdef.PACKET]['timestamp.current.shift.afterpostprocess'])
     ts_new = opt_ts[0] + ts_shift

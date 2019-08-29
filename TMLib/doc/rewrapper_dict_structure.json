@@ -46,6 +46,10 @@
                 }
                 , "tcp.window.shift" : "val[int]#delta between old and new window size"
             }
+            , "tcp.timestamp.shift" : {
+                "val[str]#ip address" : "val[float]#timestamp shift"
+            }
+            , "tcp.timestamp.shift.default" : "val[float]#timestamp shift"
         }
         , "target" : {
             "mac_address_map" : {
@@ -95,12 +99,17 @@
                         "val[int]#port" : {
                             "counter" : "val[int]#packet count"
                             , "conversation.state" : "val[str]#conversation state" 
+                            , "tcp.timestamp.map" : {
+                                "val[str]#ip address" : {
+                                    "val[float]#timestamp old" : "val[float]#timestamp new"
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
+            }
     , "packet" : {
         "timestamp.current.old" : "val[float]"
         , "timestamp.current.new" : "val[float]"
