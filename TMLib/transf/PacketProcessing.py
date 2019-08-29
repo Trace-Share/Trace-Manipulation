@@ -616,7 +616,7 @@ def tcp_timestamp_change(packet, data):
         ## TODO Hardcoded normalization
     ts_shift=data[TMdef.GLOBAL][TMdef.ATTACK]['tcp.timestamp.shift'].get(
         ip_src_old,
-        data[TMdef.GLOBAL][TMdef.ATTACK]['tcp.timestamp.shift']["tcp.timestamp.shift.default"]
+        data[TMdef.GLOBAL][TMdef.ATTACK]["tcp.timestamp.shift.default"]
         )
 
     #ts_shift = int(data[TMdef.PACKET]['timestamp.current.shift.afterpostprocess'])
