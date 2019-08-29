@@ -162,11 +162,30 @@ value - these possible keys
 """
 subsribed_functions = { # dictionary of known transformation functions
 
+'cookedlinux_src_change' : {
+    PREPROCESSING : [
+        {
+        PROTOCOL : inet.Ether
+        , FUNCTION : mac_dict_atruntime_withprefix(['src'])
+        }
+    ]
+    , PROCESSING : [
+        {
+        PROTOCOL : inet.CookedLinux
+        , FUNCTION : TMpp.mac_src_default
+        }
+    ]
+    , FILL : [
+        Filler.make_mac_map
+        , lambda _data, _config : _data[TMdef.GLOBAL].update({'mac_remmap' : {}} )
+    ]
+}
+
 #################
 #### Ether
 #################
 
-'mac_change_default' : {
+, 'mac_change_default' : {
     PREPROCESSING : [
         {
         PROTOCOL : inet.Ether
