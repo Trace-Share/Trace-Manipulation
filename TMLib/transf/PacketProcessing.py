@@ -620,15 +620,22 @@ def tcp_timestamp_change(packet, data):
         )
 
     #ts_shift = int(data[TMdef.PACKET]['timestamp.current.shift.afterpostprocess'])
-    ts_new = opt_ts[0] + ts_shift
-    timestamps[opt_ts[0]] = ts_new
-    opt_ts[0] = ts_new
+    if opt_ts[0] != 0:
+        ts_new = opt_ts[0] + ts_shift
+        timestamps[opt_ts[0]] = ts_new
+        opt_ts[0] = ts_new
 
-    ts_echo_prev = timestamps.get(opt_ts[0])
-    if ts_echo_prev is None:
-        ## TODO Define better rules for unknown timestamp
-        ts_echo_prev = max(timestamps.values())
-    opt_ts[1] = ts_echo_prev
+    if opt_ts[1] != 0:
+        ts_echo_prev = timestamps.get(opt_ts[1])
+        if ts_echo_prev is None:
+            ## TODO Define better rules for unknown timestamp
+            ip_dst_old = data[TMdef.PACKET]['ip_dst_old']
+            ts_shift=data[TMdef.GLOBAL][TMdef.ATTACK]['tcp.timestamp.shift'].get(
+                ip_dst_old,
+                data[TMdef.GLOBAL][TMdef.ATTACK]["tcp.timestamp.shift.default"]
+                )
+            ts_echo_prev = opt_ts[1] + ts_shift
+        opt_ts[1] = ts_echo_prev
 
     options[opt_i]= (opt_txt, tuple(opt_ts))
     
