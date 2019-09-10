@@ -325,14 +325,27 @@ subsribed_functions = { # dictionary of known transformation functions
         TMrc.recalculate_win_size
     ]
 }
-# , 'tcp_timestamp_change' : {
-#     PROCESSING : [
-#         {
-#         PROTOCOL : inet.TCP
-#         , FUNCTION : TMpp.tcp_timestamp_change
-#         }
-#     ]
-# }
+, 'tcp_timestamp_change' : {
+    PROCESSING : [
+        {
+        PROTOCOL : inet.TCP
+        , FUNCTION : TMpp.tcp_timestamp_change
+        }
+    ]
+    , PREPROCESSING : [ 
+        { 
+        PROTOCOL : inet.IP
+        , FUNCTION : TMpp.get_new_ips
+        }
+        , {
+        PROTOCOL : inet6.IPv6
+        , FUNCTION : TMpp.get_new_ips
+        }
+    ]
+    , FILL : [
+        Filler.make_tcp_timestamp_shift_map
+    ]
+}
 , 'tcp_mss_change' : {
     PROCESSING : [
         {
