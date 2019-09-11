@@ -929,7 +929,7 @@ def get_new_ips(packet, data):
     get_ip_dst(packet, data)
 
 
-def get_ip_src(packet, data):
+def get_ip_src(packet, data, src='src'):
     """
     Stores new IP address after searching IP map into volite entry under 'ip_src_new'. 
     If no entry in map with such ip found then new=old.
@@ -1011,9 +1011,15 @@ def tcp_get_conversation_dict(packet, data):
     return dc
 
 
-def if_has_protocol_else_default(protocol, f, default, packet, data):
+def if_has_protocol_else_default(protocol, f, packet, data, default=(lambda _,_: None)):
     try:
         return f(packet[protocol], data)
     except IndexError:
-        return default
+        return default(packet, data)
+
+def default(packet, data):
+    data[TMdef.PACKET]['ip_src_old'] = None
+    data[TMdef.PACKET]['ip_dst_old'] = None
+    data[TMdef.PACKET]['ip_src_new'] = None
+    data[TMdef.PACKET]['ip_dst_new'] = None
 

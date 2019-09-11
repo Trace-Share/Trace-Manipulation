@@ -505,7 +505,7 @@ timestamp_function_dict = { # dictionary of known timestamp generation functions
         lambda packet, data, previous_timestamp_old, previous_timestamp_new,
          current_timestamp_old, new_timestamp : 
          new_timestamp if TMpp.if_has_protocol_else_default(scapy.IP, TMpp.get_new_ips,
-          None, packet, data) is None else new_timestamp
+         packet, data, default=TMpp.default) is None else new_timestamp
     )
     , ALT : TMtg.timestamp_dynamic_shift
     , FILL : [
