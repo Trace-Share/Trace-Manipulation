@@ -1011,7 +1011,7 @@ def tcp_get_conversation_dict(packet, data):
     return dc
 
 
-def if_has_protocol_else_default(protocol, f, packet, data, default=(lambda _,_: None)):
+def if_has_protocol_else_default(protocol, f, packet, data, default=(lambda x,y: None)):
     try:
         return f(packet[protocol], data)
     except IndexError:
