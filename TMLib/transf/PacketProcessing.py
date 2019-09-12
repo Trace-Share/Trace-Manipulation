@@ -432,7 +432,6 @@ def tcp_change_default(packet, data):
     :param packet: scapy TCP packet
     :param data: dict containing TMLib.TMdict dictionaries
     """
-    tcp_win_size_change(packet, data)
     tcp_mss_change(packet, data)
     tcp_sport_change(packet, data)
     tcp_dport_change(packet, data)
