@@ -55,7 +55,7 @@ def exportSQLite3_toCSV(extract, statistics, filepath = '.'):
     table_list = extractTables(connection)
     for table in table_list:
             with ( Path(filepath) / f'{table}.csv' ).open('a') as _handle:
-                r = connection.execute(f"select * from table")
+                r = connection.execute(f"select * from {table}")
                 _handle.write( ','.join(r.keys()) )
                 row = r.fetchone()
                 while row != None:
