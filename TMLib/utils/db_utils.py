@@ -1,9 +1,7 @@
 import pandas as pd
 import csv
-import os
+from pathlib import Path
 from sqlalchemy import create_engine
-
-import ID2TLib.Utility as Util
 
 
 def connection_SQLite3_fromStatistics(statistics):
@@ -15,7 +13,7 @@ def connection_SQLite3_fromStatistics(statistics):
     :param statistics: Core.Statistics.Statistics object
     :return: SQLalchemy DB engine
     """
-    return create_engine('sqlite:///' + statistics.path_db)
+    return create_engine(f'sqlite:///{statistics.path_db}')
 
 
 def connection_SQLite3_fromPath(file_path):
@@ -27,7 +25,7 @@ def connection_SQLite3_fromPath(file_path):
     :param statistics: String containing path to sqlite db.
     :return: SQLalchemy DB engine
     """
-    return create_engine('sqlite:///' + file_path)
+    return create_engine(f'sqlite:///{file_path}')
 
 
 def extractTables(e):
@@ -56,7 +54,13 @@ def exportSQLite3_toCSV(extract, statistics, filepath = '.'):
     connection = extract(statistics)
     table_list = extractTables(connection)
     for table in table_list:
-            pd.read_sql_table(table, connection).to_csv( os.path.join(filepath, table + '.csv'))
+            with ( Path(filepath) / f'{table}.csv' ).open('a') as _handle:
+                r = connection.execute(f"select * from table")
+                _handle.write( ','.join(r.keys()) )
+                row = r.fetchone()
+                while row != None:
+                    _handle.write( ',',join(row) )
+                # pd.read_sql_table(table, connection).to_csv( str(Path(filepath) / f'{table}.csv') )
 
 def exportSQLite3_toXLSX(extract, statistics, filename, filepath = '.'):
     """
@@ -71,7 +75,7 @@ def exportSQLite3_toXLSX(extract, statistics, filename, filepath = '.'):
     """
     connection = extract(statistics)
     table_list = extractTables(connection)
-    xlsx_file = os.path.join(filepath, filename + '.xlsx')
+    xlsx_file = str( Path(filepath) / f'{filename}.xlsx' )
     with pd.ExcelWriter(xlsx_file) as writer:
         for table in table_list:
             pd.read_sql_table(table, connection).to_excel(writer, sheet_name = table)
