@@ -59,7 +59,7 @@ def exportSQLite3_toCSV(extract, statistics, filepath = '.'):
                 _handle.write( ','.join(r.keys()) )
                 row = r.fetchone()
                 while row != None:
-                    _handle.write( ','.join(row) )
+                    _handle.write( ','.join([str(i) for i in row]) )
                 # pd.read_sql_table(table, connection).to_csv( str(Path(filepath) / f'{table}.csv') )
 
 def exportSQLite3_toXLSX(extract, statistics, filename, filepath = '.'):
