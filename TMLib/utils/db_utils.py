@@ -59,6 +59,7 @@ def exportSQLite3_toCSV(extract, statistics, filepath = '.'):
                 _handle.write( ','.join(r.keys()) )
                 row = r.fetchone()
                 while row != None:
+                    _handle.write('\n')
                     _handle.write( ','.join([str(i) for i in row]) )
                     row = r.fetchone()
                 # pd.read_sql_table(table, connection).to_csv( str(Path(filepath) / f'{table}.csv') )
