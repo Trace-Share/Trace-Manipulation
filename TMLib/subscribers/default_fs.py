@@ -226,6 +226,16 @@ subsribed_functions = { # dictionary of known transformation functions
 #################
 #### ICMPv4
 #################
+
+, 'icmp_auto_checksum' : {
+    PROCESSING : [
+        {
+            PROTOCOL : inet.ICMP
+            , FUNCTION : TMpp.icmp_auto_checksum
+        }
+    ]
+}
+
 , 'icmp_ip_change_default' : {
     PROCESSING : [
         {
@@ -439,7 +449,7 @@ subsribed_functions = { # dictionary of known transformation functions
 , 'udp_auto_checksum' : {
     PROCESSING : [
         {
-        PROTOCOL : inet.TCP
+        PROTOCOL : inet.UDP
         , FUNCTION : TMpp.udp_auto_checksum
         }
     ]
