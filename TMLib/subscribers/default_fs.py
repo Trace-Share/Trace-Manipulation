@@ -227,11 +227,28 @@ subsribed_functions = { # dictionary of known transformation functions
 #### ICMPv4
 #################
 
+
 , 'icmp_auto_checksum' : {
     PROCESSING : [
         {
             PROTOCOL : inet.ICMP
             , FUNCTION : TMpp.icmp_auto_checksum
+        },
+        {
+            PROTOCOL : inet.IPerror
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet.TCPerror
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet.UDPerror
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet.ICMPerror
+            , FUNCTION : TMpp.generic_chksum
         }
     ]
 }

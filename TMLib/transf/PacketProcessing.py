@@ -911,6 +911,14 @@ def httpv1_regex_ip_swap(packet, data):
 ################## Helpers
 ###############################################
 
+
+def generic_chksum(packet, data):
+    packet.setfieldval("chksum", None)
+
+###############################################
+################## Helpers
+###############################################
+
 def globalRWdict_findMatch(data, field, key):
     """
     Generic question for matching TMdef.GLOBAL dict TMdef.TARGET fields for single key.
