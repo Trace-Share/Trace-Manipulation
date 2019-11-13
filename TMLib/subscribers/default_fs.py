@@ -318,6 +318,55 @@ subsribed_functions = { # dictionary of known transformation functions
 }
 
 #################
+#### ICMPv6
+#################
+
+, 'icmp_auto_checksum' : {
+    PROCESSING : [
+        {
+            PROTOCOL : inet6.ICMPv6Unknown
+            , FUNCTION : TMpp.icmp_auto_checksum
+        },
+        {
+            PROTOCOL : inet6.ICMPv6DestUnreach
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet6.ICMPv6DestUnreach
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet6.ICMPv6PacketTooBig
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet6.ICMPv6TimeExceeded
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet6.ICMPv6ParamProblem
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet6.ICMPv6EchoReques
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet6.ICMPv6EchoReply
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet6.ICMPv6MLReport2
+            , FUNCTION : TMpp.generic_chksum
+        },
+        {
+            PROTOCOL : inet6.ICMPv6MRD_Advertisement
+            , FUNCTION : TMpp.generic_chksum
+        }
+    ]
+}
+
+#################
 #### TCP
 #################
 , 'tcp_win_size_change' : {
