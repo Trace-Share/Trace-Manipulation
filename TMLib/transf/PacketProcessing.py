@@ -913,7 +913,15 @@ def httpv1_regex_ip_swap(packet, data):
 
 
 def generic_chksum(packet, data):
-    packet.setfieldval("chksum", None)
+    try:
+        packet.setfieldval("chksum", None)
+    except AttributeError:
+        pass
+    try:
+        packet.setfieldval("cksum", None)
+    except AttributeError:
+        pass
+    
 
 ###############################################
 ################## Helpers
