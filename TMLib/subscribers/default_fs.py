@@ -321,7 +321,7 @@ subsribed_functions = { # dictionary of known transformation functions
 #### ICMPv6
 #################
 
-, 'icmp_auto_checksum' : {
+, 'icmp6_auto_checksum' : {
     PROCESSING : [
         {
             PROTOCOL : inet6.ICMPv6Unknown
@@ -348,7 +348,7 @@ subsribed_functions = { # dictionary of known transformation functions
             , FUNCTION : TMpp.generic_chksum
         },
         {
-            PROTOCOL : inet6.ICMPv6EchoReques
+            PROTOCOL : inet6.ICMPv6EchoRequest
             , FUNCTION : TMpp.generic_chksum
         },
         {
