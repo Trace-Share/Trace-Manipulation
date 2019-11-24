@@ -1,6 +1,6 @@
 import random
 
-import ID2TLib.Utility as Util
+import dependency.ID2T.ID2TLib.Utility as Util
 
 from .. import Definitions as TMdef 
 
