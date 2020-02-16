@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from . import Definitions as TMdef
 
 class ReWrapper(object):
@@ -241,7 +243,7 @@ class ReWrapper(object):
         """
         if not timestamp_shift and timestamp_shift != 0:
             raise TypeError('NoneType passed as timestamp_shift value.')
-        self.data_dict[TMdef.GLOBAL][TMdef.ATTACK]['timestamp_shift'] = timestamp_shift
+        self.data_dict[TMdef.GLOBAL][TMdef.ATTACK]['timestamp_shift'] = Decimal(timestamp_shift)
 
 
     def get_timestamp_shift(self):

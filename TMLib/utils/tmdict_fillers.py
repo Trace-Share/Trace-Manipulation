@@ -1,4 +1,5 @@
 import numbers
+from decimal import Decimal
 
 from .. import Definitions as TMdef 
 from ..utils.utils import find_or_make
@@ -82,13 +83,13 @@ def make_tcp_delay_map_forLabel(label, statistics, data, source):
         if not ip_dict:
             ip_dict = {}
             delay_dict[conversation[0]] = ip_dict
-        ip_dict[conversation[1]] = conversation[2]
+        ip_dict[conversation[1]] = Decimal(conversation[2])
         
         ip_dict = delay_dict.get(conversation[1])
         if not ip_dict:
             ip_dict = {}
             delay_dict[conversation[1]] = ip_dict
-        ip_dict[conversation[0]] = conversation[2]
+        ip_dict[conversation[0]] = Decimal(conversation[2])
 
 
 def make_tcp_avg_delay_map(*args, **kwargs):
