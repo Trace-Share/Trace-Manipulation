@@ -1,4 +1,3 @@
-from decimal import Decimal
 
 from . import Definitions as TMdef
 
@@ -102,7 +101,7 @@ class GlobalRWdict(dict):
 
         :param timestamp_shift: Timestamp shift.
         """
-        self[TMdef.ATTACK]['timestamp_shift'] = Decimal(timestamp_shift)
+        self[TMdef.ATTACK]['timestamp_shift'] = timestamp_shift
 
 
     def to_mss_exceptions(self, ip_from):
@@ -190,13 +189,13 @@ class GlobalRWdict(dict):
         if not ip_dict:
             ip_dict = {}
             delay_dict[ip_from] = ip_dict
-        ip_dict[ip_to] = Decimal(avg_delay)
+        ip_dict[ip_to] = avg_delay
 
         ip_dict = delay_dict.get(ip_to)
         if not ip_dict:
             ip_dict = {}
             delay_dict[ip_to] = ip_dict
-        ip_dict[ip_from] = Decimal(avg_delay)
+        ip_dict[ip_from] = avg_delay
 
 
     def to_timestamp_random_delay_threshold_map(self, ip, threshold):
@@ -206,7 +205,7 @@ class GlobalRWdict(dict):
         :param ip: ip address, string
         :param threshold: threshold, float or string
         """
-        self[TMdef.ATTACK]['timestamp_delay_map'][ip] = Decimal(threshold)
+        self[TMdef.ATTACK]['timestamp_delay_map'][ip] = threshold
 
 
     def to_timestamp_random_delay_set(self, ip):
