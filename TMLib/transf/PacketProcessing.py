@@ -9,6 +9,7 @@ import scapy_extend.http as http
 import re
 
 from .. import Definitions as TMdef
+from ..utils.utils import find_or_make, to_hex
 
 
 #########################################
@@ -34,6 +35,25 @@ ipv6_regex = re.compile(r'((?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|\n'
 qdcount = 'qdcount'
 rcount = ['ancount', 'nscount', 'arcount']
 rname = ['an', 'ns', 'ar']
+
+#########################################
+############## Cooked Linux
+#########################################
+
+def cookedlinux_src_change(packet, data):
+    """
+    Changest mac src adress of packet based on mac adress map in data.
+    Data must be a dictionary containing entry mac_address_map that contains dictionary of adresses in form old_mac: new_mac
+
+    :param packet: Ether packet; expected scapy ether packet.
+    :param data: Dictionary containing entry mac_address_map containing mapping of mac adresses
+    """
+    mac_new = globalRWdict_findMatch(data, 'mac_address_map',
+        ':'.join([to_hex(i,l=2) for i in packet.getfieldval('src')[:-2]])
+    )
+    if mac_new:
+        packet.setfieldval('src', bytes.fromhex(mac_new.replace(':', '')) + b'\x00\x00' )
+
 
 #########################################
 ############## Ether
@@ -205,12 +225,21 @@ def ip_ttl_change(packet, data):
         if ttl_new:
             packet.setfieldval('ttl', ttl_new)
         else:
-            packet.setfieldval('ttl', data[TMdef.GLOBAL][TMdef.TARGET]['ip_ttl_default'])
+            default = data[TMdef.GLOBAL][TMdef.TARGET]['ip_ttl_default']
+            if default is not None:
+                packet.setfieldval('ttl', data[TMdef.GLOBAL][TMdef.TARGET]['ip_ttl_default'])
 
 
 def ip_auto_checksum(packet, data):
     packet.setfieldval("chksum", None)
 
+
+###########################################
+############### ICMPv4
+###########################################
+
+def icmp_auto_checksum(packet, data):
+    packet.setfieldval("chksum", None)
 
 ###########################################
 ############### IPv6
@@ -273,8 +302,8 @@ def ipv6_hlim_change(packet, data):
             packet.setfieldval('hlim', ttl_new)
         else:
             default = data[TMdef.GLOBAL][TMdef.TARGET]['ip_ttl_default']
-            if deault is not None:
-                packet.setfieldval('hlim', data[TMdef.GLOBAL][TMdef.TARGET]['ip_ttl_default'])
+            if default is not None:
+                packet.setfieldval('hlim', default)
 
 def ivp6_routing_header_change(packet, data):
     """
@@ -367,10 +396,10 @@ def icmpv6MLReport2_change(packet, data):
     """
     records = packet.getfieldval('records')
     if records:
-        for i in len(records):
+        for record in records:
             # TODO FIX incorrect multicast record changes
-            ipv6_dst_change(packet, data)
-            icmpv6_sources_change(packet, data) 
+            ipv6_dst_change(record, data)
+            icmpv6_sources_change(record, data) 
 
 
 def icmpv6_lladdr_change(packet, data):
@@ -414,27 +443,20 @@ def tcp_change_default(packet, data):
     :param packet: scapy TCP packet
     :param data: dict containing TMLib.TMdict dictionaries
     """
-    tcp_win_size_change(packet, data)
     tcp_mss_change(packet, data)
     tcp_sport_change(packet, data)
     tcp_dport_change(packet, data)
 
 def tcp_conversation_tracker(packet, data):
     """
-    TODO finish conversation tracker
+    Preprocessing function that tracks tcp conversations based
+    on IP source & destination addresses and TCP source and destination
+    ports. Conversations are divided into init(tial handshake) and conv(versaion).
+    States are tracked based on a counter - number of the packet in the conversation
+    counted from 0.
 
-    Conversation state:
-    * handshake.first -> Maybe?
-    * handshake.second
-    * handskahe.last
-    * conv
-
-    ?? RST
-    ?? FIN
-
-    TODO functions
-        * record conversation progress - states
-        * track options - Window Scale, ??More
+    :param packet: scapy TCP packet
+    :param data: dict containing TMLib.TMdict dictionaries
     """
     c_dict = tcp_get_conversation_dict(packet, data)
     global_c_dict = tcp_get_global_dict_conversation_entry(packet, data)
@@ -449,41 +471,51 @@ def tcp_conversation_tracker(packet, data):
 
     guess = True
     if global_c_dict is not None:
-        handshake_packets = global_c_dict.get('handshake.first_two')
+        handshake_packets = global_c_dict.get('counter.handshake.first_two')
         if handshake_packets is not None:
             guess = False
             new_state = 'init' if counter in handshake_packets else new_state
 
     if guess:
-        # TODO add key
         init = data[TMdef.GLOBAL]['tcp']['rcwnd.common'].get(packet.getfieldval('window'))
         if init is not None:
             new_state = 'init'
 
 
-    c_dict['conversation.state'] = new_state
-    
+    c_dict['conversation.state'] = new_state     
 
 
 IRW_STATES = ['init']
 def tcp_win(packet, data):
     """
-    TODO Finish win size
-    TODO Define query to export minimum
+    Processing function that adjusts TCP window size values. Requires
+    conversation state to be tracked. Initial window size during handshake is
+    mapped directly based on specified mapping. 
+    
+    Window size during conversation is shifted based on specified value.
+
+    Each of the above can be specified for each (descending priority)
+        * conversation
+        * ip address
+        * pcap
+
+    :param packet: scapy TCP packet
+    :param data: dict containing TMLib.TMdict dictionaries
     """
     c_dict = tcp_get_conversation_dict(packet, data)
-    congestion_control = c_dict['congestion_control']
     global_c_dict = tcp_get_global_dict_conversation_entry(packet, data)
 
     conversation_state = c_dict['conversation.state']
 
+    old_win = packet.getfieldval('window')
+
     if conversation_state in IRW_STATES:
-        # TODO set Initial Window
         ## Find conversation specific value
-        win = global_c_dict.get('tcp.IRW')
+        win=None
+        if global_c_dict is not None:
+            win = global_c_dict.get('tcp.window.irw')
         ## Find the general ip based value
         if win is None:
-            # TODO add the keys
             win = data[
                     TMdef.GLOBAL
                     ][
@@ -498,7 +530,14 @@ def tcp_win(packet, data):
                         ]
                     )
             if win is not None:
-                win = win.get('IRW')
+                win = win.get('tcp.window.irw')
+        
+        if win is not None:
+            _w = win.get(old_win)
+            if _w is None:
+                _w = win.get('default')
+            win = _w
+
         ## Find default value
         if win is None:
             win = data[
@@ -506,29 +545,26 @@ def tcp_win(packet, data):
                     ][
                     TMdef.ATTACK
                     ][
-                    'tcp.defaults.IRW'
+                    'tcp.defaults'
+                    ][
+                    'tcp.window.irw'
                     ]
-
-    # TODO add window changes
+            _w = win.get(old_win)
+            if _w is None:
+                ## This should raise exception if missing
+                ## dont use .get()
+                _w = win.get('default')
+            win = _w
+            
+            if win is None:
+                win = old_win
     else:
-        # TODO add window scaling detection 
-        # TODO determine if scaling tracking is required
-        # is_scaled = True
-        # if is_scaled:
-        old_win = packet.getfieldval('window')
-        """
-        Opt 1 
-            - store old (? & new) buffer size
-            - store new/old ratio
-            - new_win = old_win * ratio
-            ? track changes in buffer size max
-            TODO add keys
-        """
-        win_ratio = global_c_dict.get('tcp.win_ratio')
+        win_shift = None
+        if global_c_dict is not None:
+            win_shift = global_c_dict.get('tcp.window.shift')
         ## Find the general ip based value
-        if win_ratio is None:
-            # TODO add the keys
-            win_ratio = data[
+        if win_shift is None:
+            win_shift = data[
                     TMdef.GLOBAL
                     ][
                     TMdef.ATTACK
@@ -540,22 +576,22 @@ def tcp_win(packet, data):
                         'ip_src_old'
                         ]
                     )
-            if win_ratio is not None:
-                win_ratio = win_ratio.get('win_ratio')
+            if win_shift is not None:
+                win_shift = win_shift.get('tcp.window.shift')
         ## Find default value
-        if win_ratio is None:
-            win_ratio = data[
+        if win_shift is None:
+            win_shift = data[
                     TMdef.GLOBAL
                     ][
                     TMdef.ATTACK
                     ][
-                    'tcp.defaults.win_ratio']
-        win = old_win * win_ratio
+                    'tcp.defaults'
+                    ][
+                    'tcp.window.shift'
+                    ]
+        win = old_win + win_shift
     
     packet.setfieldval('window', win)
-
-
-
 
 
 def tcp_win_size_change(packet, data):
@@ -577,37 +613,62 @@ def tcp_win_size_change(packet, data):
             if default is not None:
                 packet.setfieldval('window', default)
 
+
 def tcp_timestamp_change(packet, data):
     """
     Changes TCP Timestamp option field. Uses timestamps generated by the rewrapper. 
-    TODO add some form of timestamp interpolation (currently the timestamps are read at each source node
-    - packets timestamp is equal to tcp timestamp)
+    Timestamps are shifted by the shift value afte postprocess.
+
+    :param packet: scapy TCP packet
+    :param data: dict containing TMLib.TMdict dictionaries
     """
     c_dict = tcp_get_conversation_dict(packet, data)
-    timestamps= c_dict.get('timestamps')
-    if timestamps is None:
-        timestamps = {0:0}
-        c_dict['timestamps']=timestamps
     
     options = packet.getfieldval('options')
     opt_ts=None
-    for o in options:
+    opt_i=None
+    opt_txt=None
+    for i in range(len(options)):
+        o=options[i]
         if o[0].lower() == 'timestamp':
-            opt_ts = o[1]
+            opt_ts = list(o[1])
+            opt_i = i
+            opt_txt=o[0]
     
     if opt_ts is None:
         return
-    
-    ts_shift = int(data[TMdef.PACKET]['timestamp.current.shift.nopostprocess'])
-    ts_new = opt_ts[0] + ts_shift
-    timestamps[opt_ts[0]] = ts_new
-    opt_ts[0] = ts_new
+    ### TODO !!!!!!!!!!!!!!!!!111
+    ip_src_old = data[TMdef.PACKET]['ip_src_old']
 
-    ts_echo_prev = timestamps.get(opt_ts[0])
-    if ts_echo_prev is None:
-        ## TODO Define better rules for unknown timestamp
-        ts_echo_prev = max(timestamps.values())
-    opt_ts[1] = ts_echo_prev
+    timestamps= c_dict.get('tcp.timestamp.map')
+    if timestamps is None:
+        timestamps = {0:0}
+        c_dict['tcp.timestamp.map']=timestamps
+        ## TODO Hardcoded normalization
+    ts_shift=data[TMdef.GLOBAL][TMdef.ATTACK]['tcp.timestamp.shift'].get(
+        ip_src_old,
+        data[TMdef.GLOBAL][TMdef.ATTACK]["tcp.timestamp.shift.default"]
+        )
+
+    #ts_shift = int(data[TMdef.PACKET]['timestamp.current.shift.afterpostprocess'])
+    if opt_ts[0] != 0:
+        ts_new = opt_ts[0] + ts_shift
+        timestamps[opt_ts[0]] = ts_new
+        opt_ts[0] = ts_new
+
+    if opt_ts[1] != 0:
+        ts_echo_prev = timestamps.get(opt_ts[1])
+        if ts_echo_prev is None:
+            ## TODO Define better rules for unknown timestamp
+            ip_dst_old = data[TMdef.PACKET]['ip_dst_old']
+            ts_shift=data[TMdef.GLOBAL][TMdef.ATTACK]['tcp.timestamp.shift'].get(
+                ip_dst_old,
+                data[TMdef.GLOBAL][TMdef.ATTACK]["tcp.timestamp.shift.default"]
+                )
+            ts_echo_prev = opt_ts[1] + ts_shift
+        opt_ts[1] = ts_echo_prev
+
+    options[opt_i]= (opt_txt, tuple(opt_ts))
     
 
 def tcp_has_win_scale(packet, data):
@@ -793,12 +854,11 @@ def dns_change_ips(packet, data):
     :param data: dict containing TMLib.TMdict dictionaries
     """
     # TODO investigate missing variable
-    qr = packet.getfieldval('qr') # question/response
-    count = packet.getfieldval(qdcount)
-    if count > 0:
-        resources = packet.getfieldval('qd')
-        for i in range(count):
-            resource = resources[i] 
+    # qr = packet.getfieldval('qr') # question/response
+    # count = packet.getfieldval(qdcount)
+    resources = packet.getfieldval('qd')
+    if resources is not None:
+        for resource in resources: 
             if 12 == resource.getfieldval('qtype'):
                 tmp = resource.getfieldval('qname')
                 if isinstance(tmp, bytes):
@@ -811,30 +871,29 @@ def dns_change_ips(packet, data):
                         resource.setfieldval('qname', ip_new)
 
     for i in range(3):
-        count = packet.getfieldval(rcount[i])
-        if count > 0:
-            resources = packet.getfieldval(rname[i])
-            for j in range(count):
-                resource = resources[j]
-                qtype = resource.getfieldval('type')
-                if qtype == 1 or qtype == 28:
-                    ip_new = data[TMdef.GLOBAL][TMdef.TARGET]['ip_address_map'].get(resource.getfieldval('rdata'))
+        resources = packet.getfieldval(rname[i])
+        if resources is None:
+            continue
+        for resource in resources:
+            qtype = resource.getfieldval('type')
+            if qtype == 1 or qtype == 28:
+                ip_new = data[TMdef.GLOBAL][TMdef.TARGET]['ip_address_map'].get(resource.getfieldval('rdata'))
+                if ip_new:
+                    resource.setfieldval('rdata', ip_new)
+            if qtype == 99:
+                ip_map = data[TMdef.GLOBAL][TMdef.TARGET]['ip_address_map']
+                tmp_data = ipv4_regex.sub(lambda m: ip_map.get(m.group(), m.group()), resource.getfieldval('rdata'))
+                resource.setfieldval('rdata', ipv6_regex.sub(lambda m: ip_map.get(m.group(), m.group()), tmp_data))
+            if qtype == 12:
+                tmp = resource.getfieldval('rrname')
+                if isinstance(tmp, bytes):
+                    ip_new = dns_reverlookup_update( tmp.decode('utf-8'), data)
                     if ip_new:
-                        resource.setfieldval('rdata', ip_new)
-                if qtype == 99:
-                    ip_map = data[TMdef.GLOBAL][TMdef.TARGET]['ip_address_map']
-                    tmp_data = ipv4_regex.sub(lambda m: ip_map.get(m.group(), m.group()), resource.getfieldval('rdata'))
-                    resource.setfieldval('rdata', ipv6_regex.sub(lambda m: ip_map.get(m.group(), m.group()), tmp_data))
-                if qtype == 12:
-                    tmp = resource.getfieldval('rrname')
-                    if isinstance(tmp, bytes):
-                        ip_new = dns_reverlookup_update( tmp.decode('utf-8'), data)
-                        if ip_new:
-                            resource.setfieldval('rrname', bytes(ip_new,'utf-8'))
-                    else:
-                        ip_new = dns_reverlookup_update( tmp, data)
-                        if ip_new:
-                            resource.setfieldval('rrname', ip_new)
+                        resource.setfieldval('rrname', bytes(ip_new,'utf-8'))
+                else:
+                    ip_new = dns_reverlookup_update( tmp, data)
+                    if ip_new:
+                        resource.setfieldval('rrname', ip_new)
 
 
 ###############################################
@@ -860,20 +919,21 @@ def httpv1_regex_ip_swap(packet, data):
 ################## Helpers
 ###############################################
 
-def find_or_make(_dict, key, _type=dict):
-    """
-    Finds entry in dictionary, or creates it and adds it to dictionary.
 
-    :param _dict: dictionary
-    :param key: key in dictionary
-    :param _type: values type (will be used to construct new value)
-    :return: Value for key
-    """
-    r = _dict.get(key)
-    if r is None:
-        r = _type()
-        _dict[key] = r
-    return r
+def generic_chksum(packet, data):
+    try:
+        packet.setfieldval("chksum", None)
+    except AttributeError:
+        pass
+    try:
+        packet.setfieldval("cksum", None)
+    except AttributeError:
+        pass
+    
+
+###############################################
+################## Helpers
+###############################################
 
 def globalRWdict_findMatch(data, field, key):
     """
@@ -899,7 +959,7 @@ def get_new_ips(packet, data):
     get_ip_dst(packet, data)
 
 
-def get_ip_src(packet, data):
+def get_ip_src(packet, data, src='src'):
     """
     Stores new IP address after searching IP map into volite entry under 'ip_src_new'. 
     If no entry in map with such ip found then new=old.
@@ -932,17 +992,21 @@ def get_ip_dst(packet, data):
     else:
         data[TMdef.PACKET]['ip_dst_new'] = ip_org
 
-TCP_GLOBAL_CONV_FIELDS = ['ip_src_old', 'ip_dst_old', 'sport', 'dport']
+TCP_GLOBAL_CONV_FIELDS = [
+    lambda pkt, dt: dt.get('ip_src_old')
+    , lambda pkt, dt : dt.get('ip_dst_old')
+    , lambda pkt, dt : pkt.getfieldval('sport')
+    , lambda pkt, dt : pkt.getfieldval('dport')
+]
 def tcp_get_global_dict_conversation_entry(packet, data):
     """
     TODO Finish description
     """
-    r = None
-    _data = data[TMdef.GLOBAL][TMdef.ATTACK]
+    r = data[TMdef.GLOBAL][TMdef.ATTACK]['tcp.conversation']
     _packet_dt = data[TMdef.PACKET]
     for field in TCP_GLOBAL_CONV_FIELDS:
-        val = _packet_dt.get(field)
-        r = _data.get(val)
+        val = field(packet,_packet_dt)
+        r = r.get(val)
         if val is None or r is None:
             return None
     return r
@@ -963,18 +1027,29 @@ def tcp_get_conversation_dict(packet, data):
     src = data[TMdef.PACKET]['ip_src_old']
     dst = data[TMdef.PACKET]['ip_dst_old']
 
-    conversations = find_or_make( data[TMdef.CONVERSATION], 'tcp.conversatios' )
-    
+    conversations = find_or_make( data[TMdef.CONVERSATION], 'tcp.conversations' )
     ## can create new dictionary
     sc = find_or_make(conversations, src)
     sc = find_or_make(sc, dst)
     sc = find_or_make(sc, sport)
     sc = find_or_make(sc, dport)
-
     ## shares the same dictionary as source conversation
     dc = find_or_make(conversations, dst)
     dc = find_or_make(dc, src)
     dc = find_or_make(dc, dport)
     dc = find_or_make(dc, sport, _type=(lambda: sc))
-
     return dc
+
+
+def if_has_protocol_else_default(protocol, f, packet, data, default=(lambda x,y: None)):
+    try:
+        return f(packet[protocol], data)
+    except IndexError:
+        return default(packet, data)
+
+def default(packet, data):
+    data[TMdef.PACKET]['ip_src_old'] = None
+    data[TMdef.PACKET]['ip_dst_old'] = None
+    data[TMdef.PACKET]['ip_src_new'] = None
+    data[TMdef.PACKET]['ip_dst_new'] = None
+
