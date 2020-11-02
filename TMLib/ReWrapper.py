@@ -300,7 +300,7 @@ class ReWrapper(object):
         ## Update timestamp data
         data[TMdef.CONVERSATION]['previous_timestamp_old'] = current_timestamp_old ## update data from next iteration
         ## Default value
-        new_timestamp = current_timestamp_old
+        new_timestamp = previous_timestamp_new
         data[TMdef.PACKET]['timestamp.current.old.nopostprocess'] = current_timestamp_old 
         if not previous_timestamp_old: 
             ## IF this is the first packet, only shift
