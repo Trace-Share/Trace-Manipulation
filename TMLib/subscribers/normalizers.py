@@ -366,6 +366,28 @@ subsribed_functions = { # dictionary of known transformation functions
     ]
 }
 
+, 'tcp_seq' : {
+    POSTPROCESSING : [
+        {
+        PROTOCOL : inet.TCP
+        , FUNCTION : TMpp.tcp_seq
+        }
+    ]
+    , PREPROCESSING : [ 
+        { 
+        PROTOCOL : inet.IP
+        , FUNCTION : TMpp.get_new_ips
+        }
+        , {
+        PROTOCOL : inet6.IPv6
+        , FUNCTION : TMpp.get_new_ips
+        }
+    ]
+    , FILL : [
+        Filler.make_tcp_timestamp_shift_map
+    ]
+}
+
 #################
 #### DNS
 #################

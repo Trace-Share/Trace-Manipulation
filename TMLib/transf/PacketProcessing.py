@@ -480,9 +480,75 @@ def tcp_conversation_tracker(packet, data):
         init = data[TMdef.GLOBAL]['tcp']['rcwnd.common'].get(packet.getfieldval('window'))
         if init is not None:
             new_state = 'init'
+    
+    c_dict['conversation.state'] = new_state   
+
+    seq = c_dict.get("seq.new")
+    if seq is None or (
+        packet.getfieldval("seq") == 0 and 
+        packet.getfieldval("ack") == 0
+    ):
+        seq = {
+            data[TMdef.PACKET]['ip_src_old'] : 0,
+            data[TMdef.PACKET]['ip_dst_old'] : 0
+        }
+        c_dict["seq.new"] = seq
+
+    old_seq = seq[data[TMdef.PACKET]['ip_src_old']]
+    payload_len = len(packet.payload)
+    seq[data[TMdef.PACKET]['ip_src_old']] = (
+        payload_len if payload_len != 0 else 1
+        + old_seq
+    )
+
+# def seq_conv_trancker(packet, data):
+#     c_dict = tcp_get_conversation_dict(packet, data)
+#     seq_dict = c_dict.get("seq.new")
+#     if seq_dict is None or (
+#         packet.getfieldval("seq") == 0 and 
+#         packet.getfieldval("ack") == 0
+#     ):
+#         seq_dict = {
+#             data[TMdef.PACKET]['ip_src_old'] : 0,
+#             data[TMdef.PACKET]['ip_dst_old'] : 0
+#         }
+#         c_dict["seq.new"] = seq_dict
+
+#     old_seq = seq_dict[data[TMdef.PACKET]['ip_src_old']]
+#     payload_len = len(packet.payload)
+#     seq_dict[data[TMdef.PACKET]['ip_src_old']] = (
+#         old_seq + 
+#         (payload_len if payload_len != 0 else int("S" in packet.flags))
+#     )
 
 
-    c_dict['conversation.state'] = new_state     
+def tcp_seq(packet, data):
+    c_dict = tcp_get_conversation_dict(packet, data)
+    seq_dict = c_dict.get("seq.new")
+
+    if seq_dict is None or (
+        packet.getfieldval("seq") == 0 and 
+        packet.getfieldval("ack") == 0
+    ):
+        seq_dict = {
+            data[TMdef.PACKET]['ip_src_old'] : 0,
+            data[TMdef.PACKET]['ip_dst_old'] : 0
+        }
+        c_dict["seq.new"] = seq_dict
+
+    old_seq = seq_dict[data[TMdef.PACKET]['ip_src_old']]
+    payload_len = len(packet.payload)
+    seq_dict[data[TMdef.PACKET]['ip_src_old']] = (
+        old_seq + 
+        (payload_len if payload_len != 0 else int("S" in packet.flags))
+    )
+
+    packet.setfieldval("ack", seq_dict[data[TMdef.PACKET]['ip_dst_old']])
+    packet.setfieldval(
+        "seq", 
+        old_seq
+    )
+
 
 
 IRW_STATES = ['init']
