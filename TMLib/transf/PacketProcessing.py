@@ -540,7 +540,7 @@ def tcp_seq(packet, data):
     payload_len = len(packet.payload)
     seq_dict[data[TMdef.PACKET]['ip_src_old']] = (
         old_seq + 
-        (payload_len if payload_len != 0 else int("S" in packet.flags))
+        (payload_len if payload_len != 0 else int("S" in packet.flags or "F" in packet.flags))
     )
 
     packet.setfieldval("ack", seq_dict[data[TMdef.PACKET]['ip_dst_old']])
