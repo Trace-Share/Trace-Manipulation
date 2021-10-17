@@ -16,11 +16,11 @@ class TMReWrapper(unittest.TestCase):
 
         rw = ReWrap.ReWrapper(statistics, globalRWdict, conversationRWdict, packetRWdict, NoPayload)
 
-        self.assertTrue( rw.data_dict[TMdef.GLOBAL] is globalRWdict )
-        self.assertTrue( rw.data_dict[TMdef.CONVERSATION] is conversationRWdict )
-        self.assertTrue( rw.data_dict[TMdef.PACKET] is packetRWdict )
+        self.assertIs( rw.data_dict[TMdef.GLOBAL], globalRWdict )
+        self.assertIs( rw.data_dict[TMdef.CONVERSATION], conversationRWdict )
+        self.assertIs( rw.data_dict[TMdef.PACKET], packetRWdict )
 
-        self.assertTrue( rw.statistics is statistics )
+        self.assertIs( rw.statistics, statistics )
 
     def test_enqueue_preprocessing_function(self):
 
@@ -34,17 +34,17 @@ class TMReWrapper(unittest.TestCase):
             output.append(i)
             i += 1
 
-        self.assertTrue( len(lib.recognized_protocols) == len(output) )
-        self.assertTrue( len(lib.recognized_protocols) == len(rw.preprocess_dict.keys()) )
+        self.assertEqual( len(lib.recognized_protocols), len(output) )
+        self.assertEqual( len(lib.recognized_protocols), len(rw.preprocess_dict.keys()) )
 
         # _function_count = list(set([len(preprocess) for preprocess in rw.preprocess_dict.items()]))
-        # self.assertTrue( len(_function_count) == 1 and _function_count[0] == 1 )
+        # self.assertEqual( len(_function_count) == 1 and _function_count[0], 1 )
 
         for i in range(len(lib.recognized_protocols)):
             p = lib.recognized_protocols[i]
             queue = rw.preprocess_dict[p]
-            self.assertTrue(len(queue) == 1)
-            self.assertTrue( queue[0]() == output[i] )
+            self.assertEqual(len(queue), 1)
+            self.assertEqual( queue[0](), output[i] )
 
         rw, _, _, _, _ = lib.build_mock_rewrapper()
 
@@ -57,16 +57,16 @@ class TMReWrapper(unittest.TestCase):
                 output.append(i)
                 i += 1
 
-        self.assertTrue( len(lib.recognized_protocols)*3 == len(output) )
-        self.assertTrue( len(lib.recognized_protocols) == len(rw.preprocess_dict.keys()) )
+        self.assertEqual( len(lib.recognized_protocols)*3, len(output) )
+        self.assertEqual( len(lib.recognized_protocols), len(rw.preprocess_dict.keys()) )
 
         j = 0
         for i in range(len(lib.recognized_protocols)):
             p = lib.recognized_protocols[i]
             for k in range(3):
                 queue = rw.preprocess_dict[p]
-                self.assertTrue(len(queue) == 3)
-                self.assertTrue( queue[k]() == output[j] )
+                self.assertEqual(len(queue), 3)
+                self.assertEqual( queue[k](), output[j] )
                 j += 1
 
     def test_enqueue_processing_function(self):
@@ -81,17 +81,17 @@ class TMReWrapper(unittest.TestCase):
             output.append(i)
             i += 1
 
-        self.assertTrue( len(lib.recognized_protocols) == len(output) )
-        self.assertTrue( len(lib.recognized_protocols) == len(rw.process_dict.keys()) )
+        self.assertEqual( len(lib.recognized_protocols), len(output) )
+        self.assertEqual( len(lib.recognized_protocols), len(rw.process_dict.keys()) )
 
         # _function_count = list(set([len(preprocess) for preprocess in rw.process_dict.items()]))
-        # self.assertTrue( len(_function_count) == 1 and _function_count[0] == 1 )
+        # self.assertEqual( len(_function_count) == 1 and _function_count[0], 1 )
 
         for i in range(len(lib.recognized_protocols)):
             p = lib.recognized_protocols[i]
             queue = rw.process_dict[p]
-            self.assertTrue(len(queue) == 1)
-            self.assertTrue( queue[0]() == output[i] )
+            self.assertEqual(len(queue), 1)
+            self.assertEqual( queue[0](), output[i] )
 
         rw, _, _, _, _ = lib.build_mock_rewrapper()
 
@@ -104,16 +104,16 @@ class TMReWrapper(unittest.TestCase):
                 output.append(i)
                 i += 1
 
-        self.assertTrue( len(lib.recognized_protocols)*3 == len(output) )
-        self.assertTrue( len(lib.recognized_protocols) == len(rw.process_dict.keys()) )
+        self.assertEqual( len(lib.recognized_protocols)*3, len(output) )
+        self.assertEqual( len(lib.recognized_protocols), len(rw.process_dict.keys()) )
 
         j = 0
         for i in range(len(lib.recognized_protocols)):
             p = lib.recognized_protocols[i]
             for k in range(3):
                 queue = rw.process_dict[p]
-                self.assertTrue(len(queue) == 3)
-                self.assertTrue( queue[k]() == output[j] )
+                self.assertEqual(len(queue), 3)
+                self.assertEqual( queue[k](), output[j] )
                 j += 1
 
     def test_enqueue_postprocessing_function(self):
@@ -128,17 +128,17 @@ class TMReWrapper(unittest.TestCase):
             output.append(i)
             i += 1
 
-        self.assertTrue( len(lib.recognized_protocols) == len(output) )
-        self.assertTrue( len(lib.recognized_protocols) == len(rw.postprocess_dict.keys()) )
+        self.assertEqual( len(lib.recognized_protocols), len(output) )
+        self.assertEqual( len(lib.recognized_protocols), len(rw.postprocess_dict.keys()) )
 
         # _function_count = list(set([len(preprocess) for preprocess in rw.postprocess_dict.items()]))
-        # self.assertTrue( len(_function_count) == 1 and _function_count[0] == 1 )
+        # self.assertEqual( len(_function_count) == 1 and _function_count[0], 1 )
 
         for i in range(len(lib.recognized_protocols)):
             p = lib.recognized_protocols[i]
             queue = rw.postprocess_dict[p]
-            self.assertTrue(len(queue) == 1)
-            self.assertTrue( queue[0]() == output[i] )
+            self.assertEqual(len(queue), 1)
+            self.assertEqual( queue[0](), output[i] )
 
         rw, _, _, _, _ = lib.build_mock_rewrapper()
 
@@ -151,16 +151,16 @@ class TMReWrapper(unittest.TestCase):
                 output.append(i)
                 i += 1
 
-        self.assertTrue( len(lib.recognized_protocols)*3 == len(output) )
-        self.assertTrue( len(lib.recognized_protocols) == len(rw.postprocess_dict.keys()) )
+        self.assertEqual( len(lib.recognized_protocols)*3, len(output) )
+        self.assertEqual( len(lib.recognized_protocols), len(rw.postprocess_dict.keys()) )
 
         j = 0
         for i in range(len(lib.recognized_protocols)):
             p = lib.recognized_protocols[i]
             queue = rw.postprocess_dict[p]
-            self.assertTrue(len(queue) == 3)
+            self.assertEqual(len(queue), 3)
             for k in range(3):
-                self.assertTrue( queue[k]() == output[j] )
+                self.assertEqual( queue[k](), output[j] )
                 j += 1
 
     def test_set_timestamp_generator(self):
@@ -169,7 +169,7 @@ class TMReWrapper(unittest.TestCase):
 
         for i in range(3):
             rw.set_timestamp_generator(lib.mock_function(i))
-            self.assertTrue( rw.timestamp_function() == i )
+            self.assertEqual( rw.timestamp_function(), i )
 
 
     def test_set_backup_timestamp_generator(self):
@@ -178,7 +178,7 @@ class TMReWrapper(unittest.TestCase):
 
         for i in range(3):
             rw.set_backup_timestamp_generator(lib.mock_function(i))
-            self.assertTrue( rw.data_dict[TMdef.GLOBAL]['generate_timestamp_function_alt']() == i )
+            self.assertEqual( rw.data_dict[TMdef.GLOBAL]['generate_timestamp_function_alt'](), i )
 
 
     def test_enqueue_timestamp_postprocessing_function(self):
@@ -190,8 +190,8 @@ class TMReWrapper(unittest.TestCase):
         rw.enqueue_timestamp_postprocess(lib.mock_function(1))
 
 
-        self.assertTrue(len(rw.timestamp_postprocess) == 1)
-        self.assertTrue( rw.timestamp_postprocess[0]() == output[0] )
+        self.assertEqual(len(rw.timestamp_postprocess), 1)
+        self.assertEqual( rw.timestamp_postprocess[0](), output[0] )
 
         rw, _, _, _, _ = lib.build_mock_rewrapper()
 
@@ -202,9 +202,9 @@ class TMReWrapper(unittest.TestCase):
             output.append(i)
 
         queue = rw.timestamp_postprocess
-        self.assertTrue(len(queue) == 3)
+        self.assertEqual(len(queue), 3)
         for i in range(3):
-            self.assertTrue( queue[i]() == output[i] )
+            self.assertEqual( queue[i](), output[i] )
 
 
     def test_set_timestamp_next_pkt(self):
@@ -213,8 +213,8 @@ class TMReWrapper(unittest.TestCase):
 
         for i in range(3):
             rw.set_timestamp_next_pkt(i)
-            self.assertTrue( rw.data_dict[TMdef.CONVERSATION]['timestamp_next_pkt'] == i )
-            self.assertTrue( rw.get_timestamp_next_pkt() == i )
+            self.assertEqual( rw.data_dict[TMdef.CONVERSATION]['timestamp_next_pkt'], i )
+            self.assertEqual( rw.get_timestamp_next_pkt(), i )
 
     def test_set_timestamp_shift(self):
 
@@ -222,8 +222,8 @@ class TMReWrapper(unittest.TestCase):
 
         for i in range(3):
             rw.set_timestamp_shift(i)
-            self.assertTrue( rw.data_dict[TMdef.GLOBAL][TMdef.ATTACK]['timestamp_shift'] == i )
-            self.assertTrue( rw.get_timestamp_shift() == i )
+            self.assertEqual( rw.data_dict[TMdef.GLOBAL][TMdef.ATTACK]['timestamp_shift'], i )
+            self.assertEqual( rw.get_timestamp_shift(), i )
 
     def test_timestamp_generation(self):
 
@@ -250,9 +250,9 @@ class TMReWrapper(unittest.TestCase):
             i *= 3
             tp.time = rw.generate_timestamp(tp, rw.data_dict)
             if i == 0:
-                self.assertTrue( tp.time == 0 )
+                self.assertEqual( tp.time, 0 )
             else:
-                self.assertTrue( tp.time == i )
+                self.assertEqual( tp.time, i )
 
 
     def test_timestamp_generation_in_place(self):
@@ -275,7 +275,7 @@ class TMReWrapper(unittest.TestCase):
         tp = Pkt(0)
         for _ in range(10):
             tp.time = rw.generate_timestamp(tp, rw.data_dict)
-            self.assertTrue( tp.time == i )
+            self.assertEqual( tp.time, i )
 
         ## Postprocess added
         rw, _, _, _, _ = lib.build_mock_rewrapper()
@@ -288,7 +288,7 @@ class TMReWrapper(unittest.TestCase):
         tp = Pkt(0)
         for _ in range(10):
             tp.time = rw.generate_timestamp(tp, rw.data_dict)
-            self.assertTrue( tp.time == i )
+            self.assertEqual( tp.time, i )
 
 
     def test_timestamp_generation_erronous(self):
@@ -317,9 +317,9 @@ class TMReWrapper(unittest.TestCase):
         for _ in range(10):
             tp.time = rw.generate_timestamp(tp, rw.data_dict)
             if i == 0:
-                self.assertTrue( tp.time == 0 )
+                self.assertEqual( tp.time, 0 )
             else:
-                self.assertTrue( tp.time == i )
+                self.assertEqual( tp.time, i )
 
         ## Postprocess added
         rw, _, _, _, _ = lib.build_mock_rewrapper()
@@ -333,9 +333,9 @@ class TMReWrapper(unittest.TestCase):
         for _ in range(10):
             tp.time = rw.generate_timestamp(tp, rw.data_dict)
             if i == 0:
-                self.assertTrue( tp.time == 0 )
+                self.assertEqual( tp.time, 0 )
             else:
-                self.assertTrue( tp.time == i )
+                self.assertEqual( tp.time, i )
 # ,None, None, None, None, None
 
         rw.set_timestamp_generator(base_f_2)
@@ -346,7 +346,7 @@ class TMReWrapper(unittest.TestCase):
         tp.time = i
         tp.time = rw.generate_timestamp(tp, rw.data_dict)
         i = i + 10 - 3
-        self.assertTrue( tp.time == i )
+        self.assertEqual( tp.time, i )
 
 
     def test_digest(self):
@@ -392,14 +392,14 @@ class TMReWrapper(unittest.TestCase):
 
             rw.digest(p_3)
 
-            self.assertTrue( p_1.value ==  values[j%len(values)]+_tf )
-            self.assertTrue( p_2.value ==  values[(j+1)%len(values)]+_tf )
-            self.assertTrue( p_3.value ==  values[(j+2)%len(values)]+_tf )
+            self.assertEqual( p_1.value,  values[j%len(values)]+_tf )
+            self.assertEqual( p_2.value,  values[(j+1)%len(values)]+_tf )
+            self.assertEqual( p_3.value,  values[(j+2)%len(values)]+_tf )
 
             if i <= 1:
-                self.assertTrue( p_3.time == 1 )
+                self.assertEqual( p_3.time, 1 )
             else:
-                self.assertTrue( p_3.time == (i*10)+3 )
+                self.assertEqual( p_3.time, (i*10)+3 )
 
             j = (j+1)%len(values)
 
