@@ -309,18 +309,14 @@ class TMReWrapper(unittest.TestCase):
         rw, _, _, _, _ = lib.build_mock_rewrapper()
 
         rw.set_timestamp_generator(base_f)
-        for i in range(3):
+        for _ in range(3):
             rw.enqueue_timestamp_postprocess(post_f)
 
-        i = 0
         tp = Pkt(0)
         for _ in range(10):
             tp.time = rw.generate_timestamp(tp, rw.data_dict)
-            if i == 0:
-                self.assertEqual( tp.time, 0 )
-            else:
-                self.assertEqual( tp.time, i )
-
+            self.assertEqual( tp.time, 0 )
+        
         ## Postprocess added
         rw, _, _, _, _ = lib.build_mock_rewrapper()
 
@@ -328,25 +324,18 @@ class TMReWrapper(unittest.TestCase):
         for i in range(3):
             rw.enqueue_timestamp_postprocess(post_f)
 
-        i = 0
         tp = Pkt(0)
         for _ in range(10):
             tp.time = rw.generate_timestamp(tp, rw.data_dict)
-            if i == 0:
-                self.assertEqual( tp.time, 0 )
-            else:
-                self.assertEqual( tp.time, i )
-# ,None, None, None, None, None
-
+            self.assertEqual( tp.time, 0 )
+        
         rw.set_timestamp_generator(base_f_2)
 
         rw.data_dict[TMdef.CONVERSATION]['previous_timestamp_new'] = 1
         rw.data_dict[TMdef.CONVERSATION]['previous_timestamp_old'] = 1
-        i = 6
-        tp.time = i
+        tp.time = 6
         tp.time = rw.generate_timestamp(tp, rw.data_dict)
-        i = i + 10 - 3
-        self.assertEqual( tp.time, i )
+        self.assertEqual( tp.time, 8 )
 
 
     def test_digest(self):
@@ -358,7 +347,7 @@ class TMReWrapper(unittest.TestCase):
                 self.payload = _payload
 
         def base_f(packet, data, previous_timestamp_old, previous_timestamp_new, current_timestamp_old, new_timestamp):
-            return new_timestamp * 10
+            return current_timestamp_old * 10
 
         def post_f(packet, data, previous_timestamp_old, previous_timestamp_new, current_timestamp_old, new_timestamp):
             return new_timestamp + 1
